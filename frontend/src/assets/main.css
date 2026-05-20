@@ -1,0 +1,91 @@
+:root {
+  --font-main: 'Sarabun', sans-serif;
+  --font-heading: 'Kanit', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: var(--font-main);
+  background: #F5F7F4;
+}
+
+.font-heading { font-family: var(--font-heading) !important; }
+.font-main { font-family: var(--font-main) !important; }
+
+/* Meal section cards */
+.meal-card {
+  border-left: 4px solid;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.meal-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+}
+.meal-breakfast { border-color: #F4A261 !important; }
+.meal-lunch { border-color: #2D6A4F !important; }
+.meal-dinner { border-color: #457B9D !important; }
+.meal-snack { border-color: #E9C46A !important; }
+
+/* Progress ring animation */
+.progress-ring circle {
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+/* Sidebar nav */
+.nav-item {
+  border-radius: 12px !important;
+  margin-bottom: 4px;
+  transition: background 0.2s;
+}
+.nav-item.active-nav {
+  background: rgba(45, 106, 79, 0.12) !important;
+}
+
+/* Stats cards */
+.stat-card {
+  border-radius: 16px;
+  transition: transform 0.2s;
+}
+.stat-card:hover { transform: translateY(-3px); }
+
+/* Nutrition bar */
+.nutrient-bar {
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: rgba(0,0,0,0.06);
+}
+.nutrient-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+
+/* Table styles */
+.data-table th {
+  font-family: var(--font-heading) !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Chart container */
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Fade transitions */
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+
+/* Page slide */
+.slide-enter-active, .slide-leave-active { transition: all 0.25s ease; }
+.slide-enter-from { opacity: 0; transform: translateX(20px); }
+.slide-leave-to { opacity: 0; transform: translateX(-20px); }

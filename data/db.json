@@ -1,0 +1,190 @@
+{
+  "users": [
+    {
+      "id": "f18c6c2a-99c2-4ba7-afee-bc4d3e52cf14",
+      "email": "demo@nutritrack.com",
+      "name": "Demo User",
+      "password": "$2b$10$PAoTDRajOhJUzklZM9Va6.fF4HIQdofKkZfDpgGwCRcJkVNPG21KO",
+      "createdAt": "2026-05-12T08:01:38.179Z"
+    }
+  ],
+  "goals": [
+    {
+      "id": "3fd59323-1165-4958-8576-3b331a1efdb9",
+      "userId": "f18c6c2a-99c2-4ba7-afee-bc4d3e52cf14",
+      "calories": 2000,
+      "carbs": 250,
+      "protein": 50,
+      "fat": 65,
+      "sugar": 50,
+      "sodium": 2300,
+      "cholesterol": 300,
+      "updatedAt": "2026-05-12T08:01:38.409Z"
+    }
+  ],
+  "foodLogs": [
+    {
+      "id": "b841f9a4-ece9-4c0f-a8aa-b55251e8e34a",
+      "userId": "f18c6c2a-99c2-4ba7-afee-bc4d3e52cf14",
+      "date": "2026-05-12",
+      "meal": "breakfast",
+      "foodItemId": null,
+      "foodName": "ข้าวต้ม",
+      "quantity": 200,
+      "calories": 130,
+      "carbs": 28,
+      "protein": 4,
+      "fat": 1,
+      "sugar": 0,
+      "sodium": 200,
+      "cholesterol": 0,
+      "createdAt": "2026-05-12T08:01:38.443Z"
+    }
+  ],
+  "activities": [
+    {
+      "id": "71ea1b6e-b3ac-4583-acf1-be464831f75a",
+      "userId": "f18c6c2a-99c2-4ba7-afee-bc4d3e52cf14",
+      "date": "2026-05-12",
+      "name": "วิ่ง",
+      "type": "คาร์ดิโอ",
+      "duration": 30,
+      "caloriesBurned": 300,
+      "intensity": "medium",
+      "notes": "",
+      "createdAt": "2026-05-12T08:01:38.475Z"
+    }
+  ],
+  "foodItems": [
+    {
+      "id": "1",
+      "name": "ข้าวสวย",
+      "calories": 130,
+      "carbs": 28,
+      "protein": 2.7,
+      "fat": 0.3,
+      "sugar": 0,
+      "sodium": 1,
+      "cholesterol": 0,
+      "servingSize": 100,
+      "unit": "g"
+    },
+    {
+      "id": "2",
+      "name": "ไข่ต้ม",
+      "calories": 78,
+      "carbs": 0.6,
+      "protein": 6.3,
+      "fat": 5.3,
+      "sugar": 0.6,
+      "sodium": 62,
+      "cholesterol": 186,
+      "servingSize": 50,
+      "unit": "g"
+    },
+    {
+      "id": "3",
+      "name": "ไก่ย่าง",
+      "calories": 165,
+      "carbs": 0,
+      "protein": 31,
+      "fat": 3.6,
+      "sugar": 0,
+      "sodium": 74,
+      "cholesterol": 85,
+      "servingSize": 100,
+      "unit": "g"
+    },
+    {
+      "id": "4",
+      "name": "ผัดกะเพรา",
+      "calories": 280,
+      "carbs": 15,
+      "protein": 22,
+      "fat": 14,
+      "sugar": 3,
+      "sodium": 890,
+      "cholesterol": 65,
+      "servingSize": 200,
+      "unit": "g"
+    },
+    {
+      "id": "5",
+      "name": "ต้มยำกุ้ง",
+      "calories": 95,
+      "carbs": 4,
+      "protein": 12,
+      "fat": 4,
+      "sugar": 2,
+      "sodium": 1200,
+      "cholesterol": 95,
+      "servingSize": 250,
+      "unit": "ml"
+    },
+    {
+      "id": "6",
+      "name": "ส้มตำ",
+      "calories": 100,
+      "carbs": 18,
+      "protein": 4,
+      "fat": 2,
+      "sugar": 8,
+      "sodium": 650,
+      "cholesterol": 0,
+      "servingSize": 150,
+      "unit": "g"
+    },
+    {
+      "id": "7",
+      "name": "นมวัวไขมันต่ำ",
+      "calories": 102,
+      "carbs": 12,
+      "protein": 8,
+      "fat": 2.5,
+      "sugar": 12,
+      "sodium": 107,
+      "cholesterol": 12,
+      "servingSize": 240,
+      "unit": "ml"
+    },
+    {
+      "id": "8",
+      "name": "กล้วยหอม",
+      "calories": 89,
+      "carbs": 23,
+      "protein": 1.1,
+      "fat": 0.3,
+      "sugar": 12,
+      "sodium": 1,
+      "cholesterol": 0,
+      "servingSize": 100,
+      "unit": "g"
+    },
+    {
+      "id": "9",
+      "name": "ข้าวโอ๊ต",
+      "calories": 389,
+      "carbs": 66,
+      "protein": 17,
+      "fat": 7,
+      "sugar": 1,
+      "sodium": 2,
+      "cholesterol": 0,
+      "servingSize": 100,
+      "unit": "g"
+    },
+    {
+      "id": "10",
+      "name": "ปลาทูนึ่ง",
+      "calories": 144,
+      "carbs": 0,
+      "protein": 23,
+      "fat": 6,
+      "sugar": 0,
+      "sodium": 80,
+      "cholesterol": 63,
+      "servingSize": 100,
+      "unit": "g"
+    }
+  ]
+}

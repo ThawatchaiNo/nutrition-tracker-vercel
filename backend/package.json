@@ -1,0 +1,22 @@
+{
+  "name": "nutrition-tracker-backend",
+  "version": "1.0.0",
+  "description": "Nutrition Tracker API Backend",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "build:frontend": "cd ../frontend && npm run build",
+    "start:full": "npm run build:frontend && npm start"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.0",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^8.0.0",
+    "uuid": "^9.0.0"
+  }
+}
