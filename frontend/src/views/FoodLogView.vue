@@ -63,9 +63,14 @@
           <template #item.sodium="{ item }">{{ item.sodium?.toFixed(0) }}</template>
           <template #item.cholesterol="{ item }">{{ item.cholesterol?.toFixed(0) }}</template>
           <template #item.actions="{ item }">
-            <v-btn icon size="x-small" color="error" variant="text" @click="deleteLog(item.id)">
-              <v-icon>mdi-delete-outline</v-icon>
-            </v-btn>
+            <div class="d-flex gap-1">
+              <v-btn icon size="x-small" color="primary" variant="text" @click="openEditDialog(item)">
+                <v-icon size="16">mdi-pencil-outline</v-icon>
+              </v-btn>
+              <v-btn icon size="x-small" color="error" variant="text" @click="deleteLog(item.id)">
+                <v-icon size="16">mdi-delete-outline</v-icon>
+              </v-btn>
+            </div>
           </template>
           <template #bottom />
         </v-data-table>
@@ -95,46 +100,32 @@
 
         <v-tabs v-model="activeTab" color="primary" class="px-5">
           <v-tab value="local">
-            <v-icon start size="18">mdi-database-outline</v-icon>
-            เมนูมาตรฐาน
+            <v-icon start size="18">mdi-database-outline</v-icon> เมนูมาตรฐาน
           </v-tab>
           <v-tab value="world">
-            <v-icon start size="18">mdi-earth</v-icon>
-            Menu of the World
+            <v-icon start size="18">mdi-earth</v-icon> Menu of the World
           </v-tab>
           <v-tab value="manual">
-            <v-icon start size="18">mdi-pencil-outline</v-icon>
-            กรอกเอง
+            <v-icon start size="18">mdi-pencil-outline</v-icon> กรอกเอง
           </v-tab>
         </v-tabs>
-
         <v-divider />
 
         <v-card-text class="pa-5 pt-4" style="min-height: 380px">
 
-          <!-- ── แท็บ 1: เมนูมาตรฐาน ── -->
+          <!-- แท็บ 1: เมนูมาตรฐาน -->
           <div v-if="activeTab === 'local'">
-            <!-- Search box -->
             <v-text-field
               v-model="localSearch"
               label="ค้นหาจากคลังเมนู"
               prepend-inner-icon="mdi-magnify"
               clearable hide-details class="mb-3"
-              @update:model-value="filterLocal"
             />
-
-            <!-- รายการทั้งหมด -->
-            <v-list
-              lines="two"
-              class="food-list rounded-xl"
-              style="max-height: 260px; overflow-y: auto"
-            >
+            <v-list lines="two" class="food-list rounded-xl" style="max-height: 260px; overflow-y: auto">
               <v-list-item
-                v-for="item in filteredLocalItems"
-                :key="item.id"
+                v-for="item in filteredLocalItems" :key="item.id"
                 :class="['mb-1 rounded-lg food-item-row', selectedFood?.id === item.id ? 'selected-row' : '']"
-                @click="selectLocalFood(item)"
-                style="cursor: pointer"
+                @click="selectLocalFood(item)" style="cursor: pointer"
               >
                 <template #prepend>
                   <v-avatar size="36" rounded="lg" :color="item.custom ? 'primary' : 'green'" variant="tonal">
@@ -151,19 +142,14 @@
                   <span class="text-caption">{{ item.calories }} kcal / {{ item.servingSize }}{{ item.unit }}</span>
                 </template>
                 <template #append>
-                  <div class="text-right" v-if="selectedFood?.id === item.id">
-                    <v-icon color="primary">mdi-check-circle</v-icon>
-                  </div>
+                  <v-icon v-if="selectedFood?.id === item.id" color="primary">mdi-check-circle</v-icon>
                 </template>
               </v-list-item>
-
               <div v-if="filteredLocalItems.length === 0" class="text-center py-6 text-medium-emphasis">
                 <v-icon size="36" color="grey-lighten-2">mdi-food-off-outline</v-icon>
                 <p class="text-body-2 mt-2">ไม่พบเมนูที่ค้นหา</p>
               </div>
             </v-list>
-
-            <!-- Preview ที่เลือก -->
             <div v-if="selectedFood" class="mt-3 selected-food-preview pa-4 rounded-xl">
               <div class="d-flex align-center gap-2 mb-2">
                 <v-icon color="primary" size="18">mdi-food</v-icon>
@@ -171,73 +157,46 @@
               </div>
               <v-row dense align="center">
                 <v-col cols="6">
-                  <v-text-field
-                    v-model.number="form.quantity"
-                    label="ปริมาณที่กิน"
-                    :suffix="selectedFood.unit || 'g'"
-                    type="number" density="compact" hide-details
-                    @update:model-value="recalcFromQuantity"
-                  />
+                  <v-text-field v-model.number="form.quantity" label="ปริมาณที่กิน" :suffix="selectedFood.unit || 'g'" type="number" density="compact" hide-details @update:model-value="recalcFromQuantity" />
                 </v-col>
                 <v-col cols="6" class="text-center">
                   <div class="text-h6 font-weight-bold text-primary">{{ form.calories }} kcal</div>
-                  <div class="text-caption text-medium-emphasis">
-                    คาร์บ {{ form.carbs }}g · โปรตีน {{ form.protein }}g · ไขมัน {{ form.fat }}g
-                  </div>
+                  <div class="text-caption text-medium-emphasis">คาร์บ {{ form.carbs }}g · โปรตีน {{ form.protein }}g · ไขมัน {{ form.fat }}g</div>
                 </v-col>
               </v-row>
             </div>
           </div>
 
-          <!-- ── แท็บ 2: Menu of the World ── -->
+          <!-- แท็บ 2: Menu of the World -->
           <div v-if="activeTab === 'world'">
             <div class="d-flex gap-2 mb-3">
-              <v-text-field
-                v-model="worldSearch"
-                label="ค้นหาอาหารทั่วโลก (ภาษาอังกฤษ)"
-                prepend-inner-icon="mdi-earth"
-                hide-details clearable
-                @keyup.enter="searchWorldFood"
-              />
+              <v-text-field v-model="worldSearch" label="ค้นหาอาหารทั่วโลก (ภาษาอังกฤษ)" prepend-inner-icon="mdi-earth" hide-details clearable @keyup.enter="searchWorldFood" />
               <v-btn color="primary" :loading="worldLoading" @click="searchWorldFood" height="56">
                 <v-icon>mdi-magnify</v-icon>
               </v-btn>
             </div>
-
             <div v-if="worldLoading" class="text-center py-8">
               <v-progress-circular indeterminate color="primary" />
               <p class="text-body-2 mt-3 text-medium-emphasis">กำลังค้นหา...</p>
             </div>
-
             <div v-else-if="worldError" class="text-center py-6">
               <v-icon color="error" size="40">mdi-wifi-off</v-icon>
               <p class="text-body-2 mt-2 text-error">{{ worldError }}</p>
             </div>
-
             <div v-else-if="!worldSearched" class="text-center py-6 text-medium-emphasis">
               <v-icon size="48" color="grey-lighten-2">mdi-earth</v-icon>
               <p class="text-body-2 mt-2">ค้นหาอาหารจากฐานข้อมูลทั่วโลก</p>
-              <p class="text-caption">เช่น rice, chicken breast, banana, pizza, egg</p>
+              <p class="text-caption">เช่น rice, chicken breast, banana, pizza</p>
             </div>
-
             <div v-else-if="worldResults.length === 0" class="text-center py-6 text-medium-emphasis">
               <v-icon size="48" color="grey-lighten-2">mdi-food-off-outline</v-icon>
               <p class="text-body-2 mt-2">ไม่พบผลลัพธ์ ลองใช้ภาษาอังกฤษครับ</p>
             </div>
-
-            <!-- รายการผลลัพธ์ -->
-            <v-list
-              v-else
-              lines="two"
-              class="food-list rounded-xl"
-              style="max-height: 220px; overflow-y: auto"
-            >
+            <v-list v-else lines="two" class="food-list rounded-xl" style="max-height: 220px; overflow-y: auto">
               <v-list-item
-                v-for="item in worldResults"
-                :key="item.code"
+                v-for="item in worldResults" :key="item.code"
                 :class="['mb-1 rounded-lg food-item-row', selectedWorldFood?.code === item.code ? 'selected-row' : '']"
-                @click="selectWorldFood(item)"
-                style="cursor: pointer"
+                @click="selectWorldFood(item)" style="cursor: pointer"
               >
                 <template #prepend>
                   <v-avatar size="40" rounded="lg" color="blue-lighten-5">
@@ -259,8 +218,6 @@
                 </template>
               </v-list-item>
             </v-list>
-
-            <!-- Preview ที่เลือก -->
             <div v-if="selectedWorldFood" class="mt-3 selected-food-preview pa-4 rounded-xl">
               <div class="d-flex align-center gap-2 mb-2">
                 <v-icon color="primary" size="18">mdi-earth</v-icon>
@@ -268,25 +225,17 @@
               </div>
               <v-row dense align="center">
                 <v-col cols="6">
-                  <v-text-field
-                    v-model.number="form.quantity"
-                    label="ปริมาณที่กิน"
-                    suffix="g"
-                    type="number" density="compact" hide-details
-                    @update:model-value="recalcFromWorldFood"
-                  />
+                  <v-text-field v-model.number="form.quantity" label="ปริมาณที่กิน" suffix="g" type="number" density="compact" hide-details @update:model-value="recalcFromWorldFood" />
                 </v-col>
                 <v-col cols="6" class="text-center">
                   <div class="text-h6 font-weight-bold text-primary">{{ form.calories }} kcal</div>
-                  <div class="text-caption text-medium-emphasis">
-                    คาร์บ {{ form.carbs }}g · โปรตีน {{ form.protein }}g · ไขมัน {{ form.fat }}g
-                  </div>
+                  <div class="text-caption text-medium-emphasis">คาร์บ {{ form.carbs }}g · โปรตีน {{ form.protein }}g · ไขมัน {{ form.fat }}g</div>
                 </v-col>
               </v-row>
             </div>
           </div>
 
-          <!-- ── แท็บ 3: กรอกเอง ── -->
+          <!-- แท็บ 3: กรอกเอง -->
           <div v-if="activeTab === 'manual'">
             <v-row>
               <v-col cols="12" sm="8">
@@ -297,33 +246,15 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="6" sm="3">
-                <v-text-field v-model.number="form.calories" label="พลังงาน" suffix="kcal" type="number" />
-              </v-col>
-              <v-col cols="6" sm="3">
-                <v-text-field v-model.number="form.carbs" label="คาร์บ" suffix="g" type="number" />
-              </v-col>
-              <v-col cols="6" sm="3">
-                <v-text-field v-model.number="form.protein" label="โปรตีน" suffix="g" type="number" />
-              </v-col>
-              <v-col cols="6" sm="3">
-                <v-text-field v-model.number="form.fat" label="ไขมัน" suffix="g" type="number" />
-              </v-col>
-              <v-col cols="6" sm="4">
-                <v-text-field v-model.number="form.sugar" label="น้ำตาล" suffix="g" type="number" />
-              </v-col>
-              <v-col cols="6" sm="4">
-                <v-text-field v-model.number="form.sodium" label="โซเดียม" suffix="mg" type="number" />
-              </v-col>
-              <v-col cols="6" sm="4">
-                <v-text-field v-model.number="form.cholesterol" label="คอเลสเตอรอล" suffix="mg" type="number" />
-              </v-col>
+              <v-col cols="6" sm="3"><v-text-field v-model.number="form.calories" label="พลังงาน" suffix="kcal" type="number" /></v-col>
+              <v-col cols="6" sm="3"><v-text-field v-model.number="form.carbs" label="คาร์บ" suffix="g" type="number" /></v-col>
+              <v-col cols="6" sm="3"><v-text-field v-model.number="form.protein" label="โปรตีน" suffix="g" type="number" /></v-col>
+              <v-col cols="6" sm="3"><v-text-field v-model.number="form.fat" label="ไขมัน" suffix="g" type="number" /></v-col>
+              <v-col cols="6" sm="4"><v-text-field v-model.number="form.sugar" label="น้ำตาล" suffix="g" type="number" /></v-col>
+              <v-col cols="6" sm="4"><v-text-field v-model.number="form.sodium" label="โซเดียม" suffix="mg" type="number" /></v-col>
+              <v-col cols="6" sm="4"><v-text-field v-model.number="form.cholesterol" label="คอเลสเตอรอล" suffix="mg" type="number" /></v-col>
             </v-row>
-            <v-checkbox
-              v-model="saveToLibrary"
-              label="บันทึกเมนูนี้ลงคลัง เพื่อใช้ซ้ำในครั้งถัดไป ⭐"
-              color="primary" hide-details class="mt-1"
-            />
+            <v-checkbox v-model="saveToLibrary" label="บันทึกเมนูนี้ลงคลัง เพื่อใช้ซ้ำในครั้งถัดไป ⭐" color="primary" hide-details class="mt-1" />
           </div>
 
         </v-card-text>
@@ -337,6 +268,43 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- ── Edit Food Dialog ── -->
+    <v-dialog v-model="editDialog" max-width="560">
+      <v-card>
+        <v-card-title class="font-heading pa-5 pb-3">
+          <v-icon color="primary" class="mr-2">mdi-pencil-outline</v-icon>
+          แก้ไขรายการอาหาร
+        </v-card-title>
+        <v-card-text class="pa-5 pt-2">
+          <v-row>
+            <v-col cols="12" sm="8">
+              <v-text-field v-model="editForm.foodName" label="ชื่ออาหาร *" prepend-inner-icon="mdi-food" />
+            </v-col>
+            <v-col cols="12" sm="4">
+              <v-text-field v-model.number="editForm.quantity" label="ปริมาณ (g/ml)" type="number" />
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="6" sm="3"><v-text-field v-model.number="editForm.calories" label="พลังงาน" suffix="kcal" type="number" /></v-col>
+            <v-col cols="6" sm="3"><v-text-field v-model.number="editForm.carbs" label="คาร์บ" suffix="g" type="number" /></v-col>
+            <v-col cols="6" sm="3"><v-text-field v-model.number="editForm.protein" label="โปรตีน" suffix="g" type="number" /></v-col>
+            <v-col cols="6" sm="3"><v-text-field v-model.number="editForm.fat" label="ไขมัน" suffix="g" type="number" /></v-col>
+            <v-col cols="6" sm="4"><v-text-field v-model.number="editForm.sugar" label="น้ำตาล" suffix="g" type="number" /></v-col>
+            <v-col cols="6" sm="4"><v-text-field v-model.number="editForm.sodium" label="โซเดียม" suffix="mg" type="number" /></v-col>
+            <v-col cols="6" sm="4"><v-text-field v-model.number="editForm.cholesterol" label="คอเลสเตอรอล" suffix="mg" type="number" /></v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions class="pa-5 pt-0">
+          <v-spacer />
+          <v-btn variant="text" @click="editDialog = false">ยกเลิก</v-btn>
+          <v-btn color="primary" :loading="editSaving" @click="saveEdit">
+            <v-icon start>mdi-content-save</v-icon> บันทึกการแก้ไข
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
   </div>
 </template>
 
@@ -350,54 +318,21 @@ const selectedDate = computed({ get: () => store.selectedDate, set: v => store.s
 const mealSummary = computed(() => store.mealSummary)
 const mealTypes = computed(() => store.mealTypes)
 
+// ── Add dialog ──
 const dialog = ref(false)
 const activeTab = ref('local')
 const activeMeal = ref('breakfast')
 const activeMealLabel = computed(() => store.mealTypes.find(m => m.value === activeMeal.value)?.label || '')
 const saving = ref(false)
 const saveToLibrary = ref(false)
-
-// ── Local food ──
+const allFoodItems = ref([])
 const localSearch = ref('')
 const selectedFood = ref(null)
-const allFoodItems = ref([])
 const filteredLocalItems = computed(() => {
   if (!localSearch.value) return allFoodItems.value
   const q = localSearch.value.toLowerCase()
   return allFoodItems.value.filter(f => f.name.toLowerCase().includes(q))
 })
-
-function filterLocal() { /* computed แล้ว */ }
-
-function selectLocalFood(item) {
-  selectedFood.value = item
-  const ratio = 1 // default 100g / servingSize
-  form.value = {
-    foodName: item.name,
-    quantity: item.servingSize || 100,
-    calories: Math.round(item.calories),
-    carbs: +item.carbs.toFixed(1),
-    protein: +item.protein.toFixed(1),
-    fat: +item.fat.toFixed(1),
-    sugar: +item.sugar.toFixed(1),
-    sodium: Math.round(item.sodium),
-    cholesterol: Math.round(item.cholesterol),
-  }
-}
-
-function recalcFromQuantity(qty) {
-  if (!selectedFood.value) return
-  const base = selectedFood.value.servingSize || 100
-  const ratio = qty / base
-  const f = selectedFood.value
-  form.value.calories = Math.round(f.calories * ratio)
-  form.value.carbs = +(f.carbs * ratio).toFixed(1)
-  form.value.protein = +(f.protein * ratio).toFixed(1)
-  form.value.fat = +(f.fat * ratio).toFixed(1)
-  form.value.sugar = +(f.sugar * ratio).toFixed(1)
-  form.value.sodium = Math.round(f.sodium * ratio)
-  form.value.cholesterol = Math.round(f.cholesterol * ratio)
-}
 
 // ── World food ──
 const worldSearch = ref('')
@@ -414,11 +349,10 @@ async function searchWorldFood() {
   worldSearched.value = true
   selectedWorldFood.value = null
   try {
-    // เรียกผ่าน backend proxy แก้ปัญหา CORS
     const res = await api.get(`/world-food?q=${encodeURIComponent(worldSearch.value.trim())}`)
     worldResults.value = res.data
   } catch (e) {
-    worldError.value = 'ไม่สามารถเชื่อมต่อได้ กรุณาลองใหม่อีกครั้ง'
+    worldError.value = 'ไม่สามารถเชื่อมต่อได้ กรุณาลองใหม่'
   } finally {
     worldLoading.value = false
   }
@@ -442,19 +376,55 @@ function selectWorldFood(item) {
 function recalcFromWorldFood(qty) {
   if (!selectedWorldFood.value) return
   const w = selectedWorldFood.value
-  const ratio = qty / 100
-  form.value.calories = Math.round(w.calories_100g * ratio)
-  form.value.carbs = +(w.carbs_100g * ratio).toFixed(1)
-  form.value.protein = +(w.protein_100g * ratio).toFixed(1)
-  form.value.fat = +(w.fat_100g * ratio).toFixed(1)
-  form.value.sugar = +(w.sugar_100g * ratio).toFixed(1)
-  form.value.sodium = Math.round(w.sodium_100g * ratio)
-  form.value.cholesterol = Math.round(w.cholesterol_100g * ratio)
+  const r = qty / 100
+  form.value.calories = Math.round(w.calories_100g * r)
+  form.value.carbs = +(w.carbs_100g * r).toFixed(1)
+  form.value.protein = +(w.protein_100g * r).toFixed(1)
+  form.value.fat = +(w.fat_100g * r).toFixed(1)
+  form.value.sugar = +(w.sugar_100g * r).toFixed(1)
+  form.value.sodium = Math.round(w.sodium_100g * r)
+  form.value.cholesterol = Math.round(w.cholesterol_100g * r)
+}
+
+function selectLocalFood(item) {
+  selectedFood.value = item
+  form.value = {
+    foodName: item.name,
+    quantity: item.servingSize || 100,
+    calories: Math.round(item.calories),
+    carbs: +item.carbs.toFixed(1),
+    protein: +item.protein.toFixed(1),
+    fat: +item.fat.toFixed(1),
+    sugar: +item.sugar.toFixed(1),
+    sodium: Math.round(item.sodium),
+    cholesterol: Math.round(item.cholesterol),
+  }
+}
+
+function recalcFromQuantity(qty) {
+  if (!selectedFood.value) return
+  const base = selectedFood.value.servingSize || 100
+  const r = qty / base
+  const f = selectedFood.value
+  form.value.calories = Math.round(f.calories * r)
+  form.value.carbs = +(f.carbs * r).toFixed(1)
+  form.value.protein = +(f.protein * r).toFixed(1)
+  form.value.fat = +(f.fat * r).toFixed(1)
+  form.value.sugar = +(f.sugar * r).toFixed(1)
+  form.value.sodium = Math.round(f.sodium * r)
+  form.value.cholesterol = Math.round(f.cholesterol * r)
 }
 
 // ── Form ──
 const emptyForm = () => ({ foodName: '', quantity: 100, calories: 0, carbs: 0, protein: 0, fat: 0, sugar: 0, sodium: 0, cholesterol: 0 })
 const form = ref(emptyForm())
+
+const canSave = computed(() => {
+  if (activeTab.value === 'local') return !!selectedFood.value
+  if (activeTab.value === 'world') return !!selectedWorldFood.value
+  if (activeTab.value === 'manual') return !!form.value.foodName
+  return false
+})
 
 const summaryStats = computed(() => {
   const s = store.dailySummary
@@ -476,7 +446,7 @@ const tableHeaders = [
   { title: 'น้ำตาล (g)', key: 'sugar', sortable: false },
   { title: 'โซเดียม (mg)', key: 'sodium', sortable: false },
   { title: 'คอเลสเตอรอล (mg)', key: 'cholesterol', sortable: false },
-  { title: '', key: 'actions', sortable: false, width: 50 },
+  { title: '', key: 'actions', sortable: false, width: 80 },
 ]
 
 function mealLogs(meal) {
@@ -495,17 +465,9 @@ function openAddDialog(meal) {
   localSearch.value = ''
   saveToLibrary.value = false
   activeTab.value = 'local'
-  // โหลดรายการทั้งหมด
   allFoodItems.value = store.foodItems
   dialog.value = true
 }
-
-const canSave = computed(() => {
-  if (activeTab.value === 'local') return !!selectedFood.value
-  if (activeTab.value === 'world') return !!selectedWorldFood.value
-  if (activeTab.value === 'manual') return !!form.value.foodName
-  return false
-})
 
 async function saveFood() {
   saving.value = true
@@ -528,6 +490,43 @@ async function saveFood() {
     dialog.value = false
   } finally {
     saving.value = false
+  }
+}
+
+// ── Edit dialog ──
+const editDialog = ref(false)
+const editSaving = ref(false)
+const editingId = ref(null)
+const editForm = ref(emptyForm())
+
+function openEditDialog(item) {
+  editingId.value = item.id
+  editForm.value = {
+    foodName: item.foodName,
+    quantity: item.quantity,
+    calories: item.calories,
+    carbs: item.carbs,
+    protein: item.protein,
+    fat: item.fat,
+    sugar: item.sugar,
+    sodium: item.sodium,
+    cholesterol: item.cholesterol,
+  }
+  editDialog.value = true
+}
+
+async function saveEdit() {
+  editSaving.value = true
+  try {
+    await api.put(`/food-logs/${editingId.value}`, editForm.value)
+    // อัปเดต local state
+    const idx = store.foodLogs.findIndex(l => l.id === editingId.value)
+    if (idx !== -1) {
+      store.foodLogs[idx] = { ...store.foodLogs[idx], ...editForm.value }
+    }
+    editDialog.value = false
+  } finally {
+    editSaving.value = false
   }
 }
 
