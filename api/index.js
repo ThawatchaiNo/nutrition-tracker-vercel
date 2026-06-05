@@ -120,6 +120,18 @@ app.post('/api/activities', auth, async (req, res) => {
   try { await connectDB(); const a = await Activity.create({ ...req.body, userId: req.user.id }); res.status(201).json({ ...a.toObject(), id: a._id }) }
   catch (e) { res.status(500).json({ error: e.message }) }
 })
+app.put('/api/activities/:id', auth, async (req, res) => {
+  try {
+    await connectDB()
+    const act = await Activity.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      req.body, { new: true }
+    )
+    if (!act) return res.status(404).json({ error: 'Not found' })
+    res.json({ ...act.toObject(), id: act._id })
+  } catch (e) { res.status(500).json({ error: e.message }) }
+})
+
 app.delete('/api/activities/:id', auth, async (req, res) => {
   try { await connectDB(); await Activity.findOneAndDelete({ _id: req.params.id, userId: req.user.id }); res.json({ success: true }) }
   catch (e) { res.status(500).json({ error: e.message }) }
