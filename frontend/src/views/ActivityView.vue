@@ -69,7 +69,7 @@
                   <v-btn icon size="x-small" color="primary" variant="text" @click="openEditDialog(act)">
                     <v-icon size="16">mdi-pencil-outline</v-icon>
                   </v-btn>
-                  <v-btn icon size="x-small" color="error" variant="text" @click="deleteActivity(act.id)">
+                  <v-btn icon size="x-small" color="error" variant="text" @click="openConfirmDelete(act)">
                     <v-icon size="16">mdi-delete-outline</v-icon>
                   </v-btn>
                 </div>
@@ -107,7 +107,7 @@
     </v-row>
 
     <!-- ── Add/Edit Activity Dialog ── -->
-    <v-dialog persistent v-model="dialog" max-width="540">
+    <v-dialog v-model="dialog" max-width="540" persistent>
       <v-card>
         <v-card-title class="font-heading pa-5 pb-3">
           <v-icon color="primary" class="mr-2">mdi-run-fast</v-icon>
@@ -161,9 +161,30 @@
       </v-card>
     </v-dialog>
   </div>
-</template>
 
-<script setup>
+  <!-- ── Confirm Delete Dialog ── -->
+  <v-dialog v-model="confirmDialog" max-width="360" persistent>
+    <v-card>
+      <v-card-title class="font-heading pa-5 pb-3">
+        <v-icon color="error" class="mr-2">mdi-alert-circle-outline</v-icon>
+        ยืนยันการลบ
+      </v-card-title>
+      <v-card-text class="pa-5 pt-0">
+        <p class="text-body-1">คุณต้องการลบกิจกรรม <strong>"{{ deletingItem?.name }}"</strong> ใช่ไหม?</p>
+        <p class="text-body-2 text-medium-emphasis mt-2">การดำเนินการนี้ไม่สามารถเรียกคืนได้</p>
+      </v-card-text>
+      <v-card-actions class="pa-5 pt-0">
+        <v-spacer />
+        <v-btn variant="text" @click="confirmDialog = false">ยกเลิก</v-btn>
+        <v-btn color="error" :loading="deleting" @click="confirmDelete">
+          <v-icon start>mdi-delete-outline</v-icon> ลบ
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+
+  <script setup>
 import { ref, computed } from 'vue'
 import { Doughnut } from 'vue-chartjs'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
@@ -253,6 +274,26 @@ async function save() {
   }
 }
 
+const confirmDialog = ref(false)
+const deletingItem = ref(null)
+const deleting = ref(false)
+
+function openConfirmDelete(act) {
+  deletingItem.value = act
+  confirmDialog.value = true
+}
+
+async function confirmDelete() {
+  deleting.value = true
+  try {
+    await store.deleteActivity(deletingItem.value.id)
+    confirmDialog.value = false
+    deletingItem.value = null
+  } finally {
+    deleting.value = false
+  }
+}
+
 async function deleteActivity(id) {
   await store.deleteActivity(id)
 }
@@ -298,28 +339,28 @@ function intensityColor(v) { return v === 'high' ? 'error' : v === 'low' ? 'succ
 function intensityLabel(v) { return v === 'high' ? 'หนัก' : v === 'low' ? 'เบา' : 'ปานกลาง' }
 </script>
 
-<style scoped>
-.activity-icon-wrap {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: rgba(244, 162, 97, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
+  <style scoped>
+    .activity-icon-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(244, 162, 97, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
 
-.activity-item-card {
-  transition: box-shadow 0.2s;
-}
+    .activity-item-card {
+      transition: box-shadow 0.2s;
+    }
 
-.activity-item-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
-}
+    .activity-item-card:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+    }
 
-.notes-box {
-  background: rgba(0, 0, 0, 0.03);
-  border-left: 3px solid rgba(45, 106, 79, 0.3);
-}
-</style>
+    .notes-box {
+      background: rgba(0, 0, 0, 0.03);
+      border-left: 3px solid rgba(45, 106, 79, 0.3);
+    }
+  </style>

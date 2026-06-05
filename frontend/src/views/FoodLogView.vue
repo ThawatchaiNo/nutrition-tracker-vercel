@@ -15,7 +15,7 @@
     </div>
 
     <!-- Meal Picker Dialog -->
-    <v-dialog persistent v-model="mealPickerDialog" max-width="360">
+    <v-dialog v-model="mealPickerDialog" max-width="360">
       <v-card>
         <v-card-title class="font-heading pa-5 pb-3">
           <v-icon color="primary" class="mr-2">mdi-food-plus-outline</v-icon>
@@ -89,7 +89,7 @@
               <v-btn icon size="x-small" color="primary" variant="text" @click="openEditDialog(item)">
                 <v-icon size="16">mdi-pencil-outline</v-icon>
               </v-btn>
-              <v-btn icon size="x-small" color="error" variant="text" @click="deleteLog(item.id)">
+              <v-btn icon size="x-small" color="error" variant="text" @click="openConfirmDeleteLog(item)">
                 <v-icon size="16">mdi-delete-outline</v-icon>
               </v-btn>
             </div>
@@ -113,7 +113,7 @@
     </div>
 
     <!-- ── Add Food Dialog ── -->
-    <v-dialog persistent v-model="dialog" max-width="660">
+    <v-dialog v-model="dialog" max-width="660" persistent>
       <v-card>
         <v-card-title class="font-heading pa-5 pb-2">
           <v-icon color="primary" class="mr-2">mdi-food-plus-outline</v-icon>
@@ -298,7 +298,7 @@
     </v-dialog>
 
     <!-- ── Choose Meal Dialog ── -->
-    <v-dialog persistent v-model="chooseMealDialog" max-width="360">
+    <v-dialog v-model="chooseMealDialog" max-width="360" persistent>
       <v-card>
         <v-card-title class="font-heading pa-5 pb-3">
           <v-icon color="primary" class="mr-2">mdi-food-plus-outline</v-icon>
@@ -323,7 +323,7 @@
     </v-dialog>
 
     <!-- ── Edit Food Dialog ── -->
-    <v-dialog persistent v-model="editDialog" max-width="560">
+    <v-dialog v-model="editDialog" max-width="560" persistent>
       <v-card>
         <v-card-title class="font-heading pa-5 pb-3">
           <v-icon color="primary" class="mr-2">mdi-pencil-outline</v-icon>
@@ -360,6 +360,28 @@
           <v-btn variant="text" @click="editDialog = false">ยกเลิก</v-btn>
           <v-btn color="primary" :loading="editSaving" @click="saveEdit">
             <v-icon start>mdi-content-save</v-icon> บันทึกการแก้ไข
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+
+    <!-- ── Confirm Delete Food Log ── -->
+    <v-dialog v-model="confirmDeleteDialog" max-width="360" persistent>
+      <v-card>
+        <v-card-title class="font-heading pa-5 pb-3">
+          <v-icon color="error" class="mr-2">mdi-alert-circle-outline</v-icon>
+          ยืนยันการลบ
+        </v-card-title>
+        <v-card-text class="pa-5 pt-0">
+          <p class="text-body-1">คุณต้องการลบ <strong>"{{ deletingLog?.foodName }}"</strong> ใช่ไหม?</p>
+          <p class="text-body-2 text-medium-emphasis mt-2">การดำเนินการนี้ไม่สามารถเรียกคืนได้</p>
+        </v-card-text>
+        <v-card-actions class="pa-5 pt-0">
+          <v-spacer />
+          <v-btn variant="text" @click="confirmDeleteDialog = false">ยกเลิก</v-btn>
+          <v-btn color="error" :loading="deleting" @click="confirmDeleteLog">
+            <v-icon start>mdi-delete-outline</v-icon> ลบ
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -593,6 +615,26 @@ async function saveEdit() {
     editDialog.value = false
   } finally {
     editSaving.value = false
+  }
+}
+
+const confirmDeleteDialog = ref(false)
+const deletingLog = ref(null)
+const deleting = ref(false)
+
+function openConfirmDeleteLog(item) {
+  deletingLog.value = item
+  confirmDeleteDialog.value = true
+}
+
+async function confirmDeleteLog() {
+  deleting.value = true
+  try {
+    await store.deleteFoodLog(deletingLog.value.id)
+    confirmDeleteDialog.value = false
+    deletingLog.value = null
+  } finally {
+    deleting.value = false
   }
 }
 
