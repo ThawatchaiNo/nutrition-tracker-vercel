@@ -15,7 +15,7 @@
     </div>
 
     <!-- Meal Picker Dialog -->
-    <v-dialog v-model="mealPickerDialog" max-width="360">
+    <v-dialog persistent v-model="mealPickerDialog" max-width="360">
       <v-card>
         <v-card-title class="font-heading pa-5 pb-3">
           <v-icon color="primary" class="mr-2">mdi-food-plus-outline</v-icon>
@@ -113,7 +113,7 @@
     </div>
 
     <!-- ── Add Food Dialog ── -->
-    <v-dialog v-model="dialog" max-width="660">
+    <v-dialog persistent v-model="dialog" max-width="660">
       <v-card>
         <v-card-title class="font-heading pa-5 pb-2">
           <v-icon color="primary" class="mr-2">mdi-food-plus-outline</v-icon>
@@ -298,7 +298,7 @@
     </v-dialog>
 
     <!-- ── Choose Meal Dialog ── -->
-    <v-dialog v-model="chooseMealDialog" max-width="360">
+    <v-dialog persistent v-model="chooseMealDialog" max-width="360">
       <v-card>
         <v-card-title class="font-heading pa-5 pb-3">
           <v-icon color="primary" class="mr-2">mdi-food-plus-outline</v-icon>
@@ -323,7 +323,7 @@
     </v-dialog>
 
     <!-- ── Edit Food Dialog ── -->
-    <v-dialog v-model="editDialog" max-width="560">
+    <v-dialog persistent v-model="editDialog" max-width="560">
       <v-card>
         <v-card-title class="font-heading pa-5 pb-3">
           <v-icon color="primary" class="mr-2">mdi-pencil-outline</v-icon>

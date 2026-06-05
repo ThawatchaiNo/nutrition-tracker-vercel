@@ -105,7 +105,7 @@
     </v-row>
 
     <!-- Add Activity Dialog -->
-    <v-dialog v-model="dialog" max-width="500">
+    <v-dialog persistent v-model="dialog" max-width="500">
       <v-card>
         <v-card-title class="font-heading pa-5 pb-3">
           <v-icon color="primary" class="mr-2">mdi-run-fast</v-icon>
