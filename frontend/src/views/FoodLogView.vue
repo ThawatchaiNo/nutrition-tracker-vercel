@@ -5,13 +5,48 @@
         <h1 class="font-heading text-h5 font-weight-bold">บันทึกอาหาร</h1>
         <p class="text-medium-emphasis text-body-2">บันทึกอาหารในแต่ละมื้อ</p>
       </div>
-      <v-text-field
-        v-model="selectedDate" type="date"
-        density="compact" hide-details style="max-width: 180px"
-        prepend-inner-icon="mdi-calendar"
-        @update:model-value="store.fetchAll()"
-      />
+      <div class="d-flex align-center gap-3">
+        <v-btn color="primary" @click="openMealPicker">
+          <v-icon start>mdi-plus</v-icon> เพิ่มอาหาร
+        </v-btn>
+        <v-text-field
+          v-model="selectedDate" type="date"
+          density="compact" hide-details style="max-width: 180px"
+          prepend-inner-icon="mdi-calendar"
+          @update:model-value="store.fetchAll()"
+        />
+      </div>
     </div>
+
+    <!-- Meal Picker Dialog -->
+    <v-dialog v-model="mealPickerDialog" max-width="360">
+      <v-card>
+        <v-card-title class="font-heading pa-5 pb-3">
+          <v-icon color="primary" class="mr-2">mdi-food-plus-outline</v-icon>
+          เลือกมื้ออาหาร
+        </v-card-title>
+        <v-card-text class="pa-5 pt-0">
+          <v-row>
+            <v-col cols="6" v-for="meal in mealTypes" :key="meal.value">
+              <v-btn
+                block height="80" variant="tonal" :color="meal.color"
+                @click="selectMealAndOpen(meal.value)"
+                class="meal-pick-btn"
+              >
+                <div class="text-center">
+                  <v-icon size="28" class="mb-1">{{ meal.icon }}</v-icon>
+                  <div class="text-body-2 font-weight-medium">{{ meal.label }}</div>
+                </div>
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions class="pa-5 pt-0">
+          <v-spacer />
+          <v-btn variant="text" @click="mealPickerDialog = false">ยกเลิก</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <!-- Daily Summary Bar -->
     <v-card class="mb-5 pa-4" color="primary" theme="dark">
@@ -269,6 +304,34 @@
       </v-card>
     </v-dialog>
 
+    <!-- ── Choose Meal Dialog ── -->
+    <v-dialog v-model="chooseMealDialog" max-width="360">
+      <v-card>
+        <v-card-title class="font-heading pa-5 pb-3">
+          <v-icon color="primary" class="mr-2">mdi-food-plus-outline</v-icon>
+          เลือกมื้ออาหาร
+        </v-card-title>
+        <v-card-text class="pa-5 pt-2">
+          <v-row>
+            <v-col cols="6" v-for="meal in mealTypes" :key="meal.value">
+              <v-btn
+                block height="72" :color="meal.color" variant="tonal"
+                class="d-flex flex-column meal-select-btn"
+                @click="chooseMealDialog = false; openAddDialog(meal.value)"
+              >
+                <v-icon size="28" class="mb-1">{{ meal.icon }}</v-icon>
+                <span class="text-body-2">{{ meal.label }}</span>
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions class="pa-5 pt-0">
+          <v-spacer />
+          <v-btn variant="text" @click="chooseMealDialog = false">ยกเลิก</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <!-- ── Edit Food Dialog ── -->
     <v-dialog v-model="editDialog" max-width="560">
       <v-card>
@@ -320,6 +383,7 @@ const mealTypes = computed(() => store.mealTypes)
 
 // ── Add dialog ──
 const dialog = ref(false)
+const chooseMealDialog = ref(false)
 const activeTab = ref('local')
 const activeMeal = ref('breakfast')
 const activeMealLabel = computed(() => store.mealTypes.find(m => m.value === activeMeal.value)?.label || '')
@@ -451,6 +515,11 @@ const tableHeaders = [
 
 function mealLogs(meal) {
   return store.todayLogs.filter(l => l.meal === meal)
+}
+
+function openAddDialogQuick() {
+  // เปิด dialog พร้อม dialog เลือกมื้อก่อน
+  chooseMealDialog.value = true
 }
 
 function openAddDialog(meal) {
