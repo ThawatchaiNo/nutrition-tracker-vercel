@@ -14,6 +14,7 @@ const routes = [
       { path: 'activity', name: 'Activity', component: () => import('../views/ActivityView.vue') },
       { path: 'reports', name: 'Reports', component: () => import('../views/ReportsView.vue') },
       { path: 'goals', name: 'Goals', component: () => import('../views/GoalsView.vue') },
+      { path: 'menu-library', name: 'MenuLibrary', component: () => import('../views/MenuLibraryView.vue') },
     ]
   }
 ]

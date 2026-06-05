@@ -47,30 +47,19 @@
 
       <!-- Nav items -->
       <v-list class="px-2">
-        <v-list-item
-          v-for="item in navItems" :key="item.to"
-          :to="item.to" :prepend-icon="item.icon"
-          :title="item.title" rounded="lg"
-          class="nav-item mb-1"
-          active-class="active-nav"
-          color="primary"
-        />
+        <v-list-item v-for="item in navItems" :key="item.to" :to="item.to" :prepend-icon="item.icon" :title="item.title"
+          rounded="lg" class="nav-item mb-1" active-class="active-nav" color="primary" />
       </v-list>
 
       <template #append>
         <v-divider class="mb-2" />
         <div class="px-2 pb-3">
-          <v-list-item
-            prepend-icon="mdi-cog-outline"
-            title="เป้าหมาย" to="/goals" rounded="lg"
-            class="nav-item mb-1" color="primary" active-class="active-nav"
-          />
-          <v-list-item
-            prepend-icon="mdi-logout"
-            title="ออกจากระบบ" rounded="lg"
-            class="nav-item" color="error"
-            @click="handleLogout"
-          />
+          <v-list-item prepend-icon="mdi-book-open-outline" title="คลังเมนูของฉัน" to="/menu-library" rounded="lg"
+            class="nav-item mb-1" color="primary" active-class="active-nav" />
+          <v-list-item prepend-icon="mdi-cog-outline" title="เป้าหมาย" to="/goals" rounded="lg" class="nav-item mb-1"
+            color="primary" active-class="active-nav" />
+          <v-list-item prepend-icon="mdi-logout" title="ออกจากระบบ" rounded="lg" class="nav-item" color="error"
+            @click="handleLogout" />
         </div>
       </template>
     </v-navigation-drawer>
@@ -130,9 +119,12 @@ function handleLogout() {
 
 <style scoped>
 .logo-badge {
-  width: 40px; height: 40px;
+  width: 40px;
+  height: 40px;
   background: rgba(45, 106, 79, 0.1);
   border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
