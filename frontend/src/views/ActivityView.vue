@@ -6,8 +6,12 @@
         <p class="text-medium-emphasis text-body-2">บันทึกการออกกำลังกายและการเผาผลาญพลังงาน</p>
       </div>
       <div class="d-flex align-center gap-3">
-        <v-text-field v-model="selectedDate" type="date" density="compact" hide-details style="max-width: 180px"
-          prepend-inner-icon="mdi-calendar" @update:model-value="store.fetchAll()" />
+        <v-text-field
+          v-model="selectedDate" type="date"
+          density="compact" hide-details style="max-width: 180px"
+          prepend-inner-icon="mdi-calendar"
+          @update:model-value="store.fetchAll()"
+        />
         <v-btn color="primary" @click="openDialog">
           <v-icon start>mdi-plus</v-icon> เพิ่มกิจกรรม
         </v-btn>
@@ -40,8 +44,11 @@
           </div>
 
           <div v-else>
-            <v-card v-for="act in activities" :key="act.id" class="mb-3 pa-4 activity-item-card" variant="outlined"
-              rounded="lg">
+            <v-card
+              v-for="act in activities" :key="act.id"
+              class="mb-3 pa-4 activity-item-card"
+              variant="outlined" rounded="lg"
+            >
               <div class="d-flex align-start justify-space-between">
                 <div class="d-flex align-start gap-3 flex-grow-1">
                   <div class="activity-icon-wrap mt-1">
@@ -51,8 +58,7 @@
                     <div class="text-body-1 font-weight-bold">{{ act.name }}</div>
                     <div class="d-flex align-center gap-2 mt-1 flex-wrap">
                       <v-chip size="x-small" :color="typeColor(act.type)" variant="tonal">{{ act.type }}</v-chip>
-                      <v-chip size="x-small" :color="intensityColor(act.intensity)" variant="tonal">{{
-                        intensityLabel(act.intensity) }}</v-chip>
+                      <v-chip size="x-small" :color="intensityColor(act.intensity)" variant="tonal">{{ intensityLabel(act.intensity) }}</v-chip>
                       <span class="text-caption text-medium-emphasis">⏱ {{ act.duration }} นาที</span>
                       <span class="text-caption text-orange font-weight-bold">🔥 {{ act.caloriesBurned }} kcal</span>
                     </div>
@@ -89,8 +95,7 @@
             <Doughnut :data="activityChartData" :options="chartOptions" style="max-height: 220px" />
             <div class="mt-4">
               <div v-for="(item, idx) in chartLegend" :key="item.name" class="d-flex align-center gap-2 mb-2">
-                <div
-                  :style="{ width: '12px', height: '12px', borderRadius: '3px', background: chartColors[idx % chartColors.length] }" />
+                <div :style="{ width: '12px', height: '12px', borderRadius: '3px', background: chartColors[idx % chartColors.length] }" />
                 <span class="text-body-2 flex-grow-1">{{ item.name }}</span>
                 <span class="text-body-2 font-weight-bold text-orange">{{ item.calories }} kcal</span>
               </div>
@@ -117,12 +122,21 @@
           <v-row>
             <!-- ชื่อกิจกรรม — TextField กรอกเองได้เลย -->
             <v-col cols="12">
-              <v-text-field v-model="form.name" label="ชื่อกิจกรรม *" prepend-inner-icon="mdi-run"
-                placeholder="เช่น วิ่ง 5 กม., เล่นฟุตบอล, ว่ายน้ำ, โยคะ..." clearable />
+              <v-text-field
+                v-model="form.name"
+                label="ชื่อกิจกรรม *"
+                prepend-inner-icon="mdi-run"
+                placeholder="เช่น วิ่ง 5 กม., เล่นฟุตบอล, ว่ายน้ำ, โยคะ..."
+                clearable
+              />
               <!-- Preset chips ให้กดเลือกได้เร็ว -->
               <div class="d-flex flex-wrap gap-2 mt-1 mb-2">
-                <v-chip v-for="p in presetNames" :key="p.name" size="small" variant="tonal" color="primary"
-                  style="cursor:pointer" @click="fillPreset(p)">
+                <v-chip
+                  v-for="p in presetNames" :key="p.name"
+                  size="small" variant="tonal" color="primary"
+                  style="cursor:pointer"
+                  @click="fillPreset(p)"
+                >
                   {{ p.name }}
                 </v-chip>
               </div>
@@ -132,8 +146,7 @@
               <v-select v-model="form.type" :items="activityTypes" label="ประเภท" />
             </v-col>
             <v-col cols="12" sm="6">
-              <v-select v-model="form.intensity" :items="intensities" item-title="label" item-value="value"
-                label="ความเข้มข้น" />
+              <v-select v-model="form.intensity" :items="intensities" item-title="label" item-value="value" label="ความเข้มข้น" />
             </v-col>
             <v-col cols="12" sm="6">
               <v-text-field v-model.number="form.duration" label="ระยะเวลา" suffix="นาที" type="number" />
@@ -144,9 +157,16 @@
 
             <!-- บันทึกเพิ่มเติม — textarea ขยายใหญ่ขึ้น เก็บรายละเอียดได้เยอะ -->
             <v-col cols="12">
-              <v-textarea v-model="form.notes" label="บันทึกรายละเอียด"
+              <v-textarea
+                v-model="form.notes"
+                label="บันทึกรายละเอียด"
                 placeholder="เช่น วิ่งรอบสวน 3 รอบ + วิดพื้น 30 ครั้ง, เล่นฟุตบอลกับเพื่อน 5 คน ได้ 2 ประตู, ว่ายน้ำท่าฟรีสไตล์ 20 เลน..."
-                rows="4" counter maxlength="1000" hint="บันทึกรายละเอียดว่าทำอะไรบ้าง เล่นอะไรบ้าง" persistent-hint />
+                rows="4"
+                counter
+                maxlength="1000"
+                hint="บันทึกรายละเอียดว่าทำอะไรบ้าง เล่นอะไรบ้าง"
+                persistent-hint
+              />
             </v-col>
           </v-row>
         </v-card-text>
@@ -162,26 +182,26 @@
     </v-dialog>
   </div>
 
-  <!-- ── Confirm Delete Dialog ── -->
-  <v-dialog v-model="confirmDialog" max-width="360" persistent>
-    <v-card>
-      <v-card-title class="font-heading pa-5 pb-3">
-        <v-icon color="error" class="mr-2">mdi-alert-circle-outline</v-icon>
-        ยืนยันการลบ
-      </v-card-title>
-      <v-card-text class="pa-5 pt-0">
-        <p class="text-body-1">คุณต้องการลบกิจกรรม <strong>"{{ deletingItem?.name }}"</strong> ใช่ไหม?</p>
-        <p class="text-body-2 text-medium-emphasis mt-2">การดำเนินการนี้ไม่สามารถเรียกคืนได้</p>
-      </v-card-text>
-      <v-card-actions class="pa-5 pt-0">
-        <v-spacer />
-        <v-btn variant="text" @click="confirmDialog = false">ยกเลิก</v-btn>
-        <v-btn color="error" :loading="deleting" @click="confirmDelete">
-          <v-icon start>mdi-delete-outline</v-icon> ลบ
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+    <!-- ── Confirm Delete Dialog ── -->
+    <v-dialog v-model="confirmDialog" max-width="360" persistent>
+      <v-card>
+        <v-card-title class="font-heading pa-5 pb-3">
+          <v-icon color="error" class="mr-2">mdi-alert-circle-outline</v-icon>
+          ยืนยันการลบ
+        </v-card-title>
+        <v-card-text class="pa-5 pt-0">
+          <p class="text-body-1">คุณต้องการลบกิจกรรม <strong>"{{ deletingItem?.name }}"</strong> ใช่ไหม?</p>
+          <p class="text-body-2 text-medium-emphasis mt-2">การดำเนินการนี้ไม่สามารถเรียกคืนได้</p>
+        </v-card-text>
+        <v-card-actions class="pa-5 pt-0">
+          <v-spacer />
+          <v-btn variant="text" @click="confirmDialog = false">ยกเลิก</v-btn>
+          <v-btn color="error" :loading="deleting" @click="confirmDelete">
+            <v-icon start>mdi-delete-outline</v-icon> ลบ
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 </template>
 
 <script setup>
@@ -343,26 +363,12 @@ function intensityLabel(v) { return v === 'high' ? 'หนัก' : v === 'low' 
 
 <style scoped>
 .activity-icon-wrap {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 36px; height: 36px; border-radius: 10px;
   background: rgba(244, 162, 97, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-
-.activity-item-card {
-  transition: box-shadow 0.2s;
-}
-
-.activity-item-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
-}
-
-.notes-box {
-  background: rgba(0, 0, 0, 0.03);
-  border-left: 3px solid rgba(45, 106, 79, 0.3);
-}
+.activity-item-card { transition: box-shadow 0.2s; }
+.activity-item-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08) !important; }
+.notes-box { background: rgba(0,0,0,0.03); border-left: 3px solid rgba(45,106,79,0.3); }
 </style>

@@ -9,8 +9,12 @@
         <v-btn color="primary" @click="openAddDialogQuick">
           <v-icon start>mdi-plus</v-icon> เพิ่มอาหาร
         </v-btn>
-        <v-text-field v-model="selectedDate" type="date" density="compact" hide-details style="max-width: 180px"
-          prepend-inner-icon="mdi-calendar" @update:model-value="store.fetchAll()" />
+        <v-text-field
+          v-model="selectedDate" type="date"
+          density="compact" hide-details style="max-width: 180px"
+          prepend-inner-icon="mdi-calendar"
+          @update:model-value="store.fetchAll()"
+        />
       </div>
     </div>
 
@@ -24,8 +28,11 @@
         <v-card-text class="pa-5 pt-0">
           <v-row>
             <v-col cols="6" v-for="meal in mealTypes" :key="meal.value">
-              <v-btn block height="80" variant="tonal" :color="meal.color" @click="selectMealAndOpen(meal.value)"
-                class="meal-pick-btn">
+              <v-btn
+                block height="80" variant="tonal" :color="meal.color"
+                @click="selectMealAndOpen(meal.value)"
+                class="meal-pick-btn"
+              >
                 <div class="text-center">
                   <v-icon size="28" class="mb-1">{{ meal.icon }}</v-icon>
                   <div class="text-body-2 font-weight-medium">{{ meal.label }}</div>
@@ -69,8 +76,14 @@
 
         <v-divider />
 
-        <v-data-table v-if="mealLogs(meal.value).length > 0" :items="mealLogs(meal.value)" :headers="tableHeaders"
-          density="compact" hide-default-footer class="data-table">
+        <v-data-table
+          v-if="mealLogs(meal.value).length > 0"
+          :items="mealLogs(meal.value)"
+          :headers="tableHeaders"
+          density="compact"
+          hide-default-footer
+          class="data-table"
+        >
           <template #item.foodName="{ item }">
             <span class="font-weight-medium">{{ item.foodName }}</span>
           </template>
@@ -137,12 +150,18 @@
 
           <!-- แท็บ 1: เมนูมาตรฐาน -->
           <div v-if="activeTab === 'local'">
-            <v-text-field v-model="localSearch" label="ค้นหาจากคลังเมนู" prepend-inner-icon="mdi-magnify" clearable
-              hide-details class="mb-3" />
+            <v-text-field
+              v-model="localSearch"
+              label="ค้นหาจากคลังเมนู"
+              prepend-inner-icon="mdi-magnify"
+              clearable hide-details class="mb-3"
+            />
             <v-list lines="two" class="food-list rounded-xl" style="max-height: 260px; overflow-y: auto">
-              <v-list-item v-for="item in filteredLocalItems" :key="item.id"
+              <v-list-item
+                v-for="item in filteredLocalItems" :key="item.id"
                 :class="['mb-1 rounded-lg food-item-row', selectedFood?.id === item.id ? 'selected-row' : '']"
-                @click="selectLocalFood(item)" style="cursor: pointer">
+                @click="selectLocalFood(item)" style="cursor: pointer"
+              >
                 <template #prepend>
                   <v-avatar size="36" rounded="lg" :color="item.custom ? 'primary' : 'green'" variant="tonal">
                     <v-icon size="18" :color="item.custom ? 'primary' : 'green'">
@@ -152,8 +171,7 @@
                 </template>
                 <template #title>
                   <span class="text-body-2 font-weight-medium">{{ item.name }}</span>
-                  <v-chip v-if="item.custom" size="x-small" color="primary" variant="tonal" class="ml-2">ของฉัน
-                    ⭐</v-chip>
+                  <v-chip v-if="item.custom" size="x-small" color="primary" variant="tonal" class="ml-2">ของฉัน ⭐</v-chip>
                 </template>
                 <template #subtitle>
                   <span class="text-caption">{{ item.calories }} kcal / {{ item.servingSize }}{{ item.unit }}</span>
@@ -174,13 +192,11 @@
               </div>
               <v-row dense align="center">
                 <v-col cols="6">
-                  <v-text-field v-model.number="form.quantity" label="ปริมาณที่กิน" :suffix="selectedFood.unit || 'g'"
-                    type="number" density="compact" hide-details @update:model-value="recalcFromQuantity" />
+                  <v-text-field v-model.number="form.quantity" label="ปริมาณที่กิน" :suffix="selectedFood.unit || 'g'" type="number" density="compact" hide-details @update:model-value="recalcFromQuantity" />
                 </v-col>
                 <v-col cols="6" class="text-center">
                   <div class="text-h6 font-weight-bold text-primary">{{ form.calories }} kcal</div>
-                  <div class="text-caption text-medium-emphasis">คาร์บ {{ form.carbs }}g · โปรตีน {{ form.protein }}g ·
-                    ไขมัน {{ form.fat }}g</div>
+                  <div class="text-caption text-medium-emphasis">คาร์บ {{ form.carbs }}g · โปรตีน {{ form.protein }}g · ไขมัน {{ form.fat }}g</div>
                 </v-col>
               </v-row>
             </div>
@@ -189,8 +205,7 @@
           <!-- แท็บ 2: Menu of the World -->
           <div v-if="activeTab === 'world'">
             <div class="d-flex gap-2 mb-3">
-              <v-text-field v-model="worldSearch" label="ค้นหาอาหารทั่วโลก (ภาษาอังกฤษ)" prepend-inner-icon="mdi-earth"
-                hide-details clearable @keyup.enter="searchWorldFood" />
+              <v-text-field v-model="worldSearch" label="ค้นหาอาหารทั่วโลก (ภาษาอังกฤษ)" prepend-inner-icon="mdi-earth" hide-details clearable @keyup.enter="searchWorldFood" />
               <v-btn color="primary" :loading="worldLoading" @click="searchWorldFood" height="56">
                 <v-icon>mdi-magnify</v-icon>
               </v-btn>
@@ -213,9 +228,11 @@
               <p class="text-body-2 mt-2">ไม่พบผลลัพธ์ ลองใช้ภาษาอังกฤษครับ</p>
             </div>
             <v-list v-else lines="two" class="food-list rounded-xl" style="max-height: 220px; overflow-y: auto">
-              <v-list-item v-for="item in worldResults" :key="item.code"
+              <v-list-item
+                v-for="item in worldResults" :key="item.code"
                 :class="['mb-1 rounded-lg food-item-row', selectedWorldFood?.code === item.code ? 'selected-row' : '']"
-                @click="selectWorldFood(item)" style="cursor: pointer">
+                @click="selectWorldFood(item)" style="cursor: pointer"
+              >
                 <template #prepend>
                   <v-avatar size="40" rounded="lg" color="blue-lighten-5">
                     <v-img v-if="item.image_small_url" :src="item.image_small_url" />
@@ -243,13 +260,11 @@
               </div>
               <v-row dense align="center">
                 <v-col cols="6">
-                  <v-text-field v-model.number="form.quantity" label="ปริมาณที่กิน" suffix="g" type="number"
-                    density="compact" hide-details @update:model-value="recalcFromWorldFood" />
+                  <v-text-field v-model.number="form.quantity" label="ปริมาณที่กิน" suffix="g" type="number" density="compact" hide-details @update:model-value="recalcFromWorldFood" />
                 </v-col>
                 <v-col cols="6" class="text-center">
                   <div class="text-h6 font-weight-bold text-primary">{{ form.calories }} kcal</div>
-                  <div class="text-caption text-medium-emphasis">คาร์บ {{ form.carbs }}g · โปรตีน {{ form.protein }}g ·
-                    ไขมัน {{ form.fat }}g</div>
+                  <div class="text-caption text-medium-emphasis">คาร์บ {{ form.carbs }}g · โปรตีน {{ form.protein }}g · ไขมัน {{ form.fat }}g</div>
                 </v-col>
               </v-row>
             </div>
@@ -266,23 +281,15 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="6" sm="3"><v-text-field v-model.number="form.calories" label="พลังงาน" suffix="kcal"
-                  type="number" /></v-col>
-              <v-col cols="6" sm="3"><v-text-field v-model.number="form.carbs" label="คาร์บ" suffix="g"
-                  type="number" /></v-col>
-              <v-col cols="6" sm="3"><v-text-field v-model.number="form.protein" label="โปรตีน" suffix="g"
-                  type="number" /></v-col>
-              <v-col cols="6" sm="3"><v-text-field v-model.number="form.fat" label="ไขมัน" suffix="g"
-                  type="number" /></v-col>
-              <v-col cols="6" sm="4"><v-text-field v-model.number="form.sugar" label="น้ำตาล" suffix="g"
-                  type="number" /></v-col>
-              <v-col cols="6" sm="4"><v-text-field v-model.number="form.sodium" label="โซเดียม" suffix="mg"
-                  type="number" /></v-col>
-              <v-col cols="6" sm="4"><v-text-field v-model.number="form.cholesterol" label="คอเลสเตอรอล" suffix="mg"
-                  type="number" /></v-col>
+              <v-col cols="6" sm="3"><v-text-field v-model.number="form.calories" label="พลังงาน" suffix="kcal" type="number" /></v-col>
+              <v-col cols="6" sm="3"><v-text-field v-model.number="form.carbs" label="คาร์บ" suffix="g" type="number" /></v-col>
+              <v-col cols="6" sm="3"><v-text-field v-model.number="form.protein" label="โปรตีน" suffix="g" type="number" /></v-col>
+              <v-col cols="6" sm="3"><v-text-field v-model.number="form.fat" label="ไขมัน" suffix="g" type="number" /></v-col>
+              <v-col cols="6" sm="4"><v-text-field v-model.number="form.sugar" label="น้ำตาล" suffix="g" type="number" /></v-col>
+              <v-col cols="6" sm="4"><v-text-field v-model.number="form.sodium" label="โซเดียม" suffix="mg" type="number" /></v-col>
+              <v-col cols="6" sm="4"><v-text-field v-model.number="form.cholesterol" label="คอเลสเตอรอล" suffix="mg" type="number" /></v-col>
             </v-row>
-            <v-checkbox v-model="saveToLibrary" label="บันทึกเมนูนี้ลงคลัง เพื่อใช้ซ้ำในครั้งถัดไป ⭐" color="primary"
-              hide-details class="mt-1" />
+            <v-checkbox v-model="saveToLibrary" label="บันทึกเมนูนี้ลงคลัง เพื่อใช้ซ้ำในครั้งถัดไป ⭐" color="primary" hide-details class="mt-1" />
           </div>
 
         </v-card-text>
@@ -307,8 +314,11 @@
         <v-card-text class="pa-5 pt-2">
           <v-row>
             <v-col cols="6" v-for="meal in mealTypes" :key="meal.value">
-              <v-btn block height="72" :color="meal.color" variant="tonal" class="d-flex flex-column meal-select-btn"
-                @click="chooseMealDialog = false; openAddDialog(meal.value)">
+              <v-btn
+                block height="72" :color="meal.color" variant="tonal"
+                class="d-flex flex-column meal-select-btn"
+                @click="chooseMealDialog = false; openAddDialog(meal.value)"
+              >
                 <v-icon size="28" class="mb-1">{{ meal.icon }}</v-icon>
                 <span class="text-body-2">{{ meal.label }}</span>
               </v-btn>
@@ -339,20 +349,13 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="6" sm="3"><v-text-field v-model.number="editForm.calories" label="พลังงาน" suffix="kcal"
-                type="number" /></v-col>
-            <v-col cols="6" sm="3"><v-text-field v-model.number="editForm.carbs" label="คาร์บ" suffix="g"
-                type="number" /></v-col>
-            <v-col cols="6" sm="3"><v-text-field v-model.number="editForm.protein" label="โปรตีน" suffix="g"
-                type="number" /></v-col>
-            <v-col cols="6" sm="3"><v-text-field v-model.number="editForm.fat" label="ไขมัน" suffix="g"
-                type="number" /></v-col>
-            <v-col cols="6" sm="4"><v-text-field v-model.number="editForm.sugar" label="น้ำตาล" suffix="g"
-                type="number" /></v-col>
-            <v-col cols="6" sm="4"><v-text-field v-model.number="editForm.sodium" label="โซเดียม" suffix="mg"
-                type="number" /></v-col>
-            <v-col cols="6" sm="4"><v-text-field v-model.number="editForm.cholesterol" label="คอเลสเตอรอล" suffix="mg"
-                type="number" /></v-col>
+            <v-col cols="6" sm="3"><v-text-field v-model.number="editForm.calories" label="พลังงาน" suffix="kcal" type="number" /></v-col>
+            <v-col cols="6" sm="3"><v-text-field v-model.number="editForm.carbs" label="คาร์บ" suffix="g" type="number" /></v-col>
+            <v-col cols="6" sm="3"><v-text-field v-model.number="editForm.protein" label="โปรตีน" suffix="g" type="number" /></v-col>
+            <v-col cols="6" sm="3"><v-text-field v-model.number="editForm.fat" label="ไขมัน" suffix="g" type="number" /></v-col>
+            <v-col cols="6" sm="4"><v-text-field v-model.number="editForm.sugar" label="น้ำตาล" suffix="g" type="number" /></v-col>
+            <v-col cols="6" sm="4"><v-text-field v-model.number="editForm.sodium" label="โซเดียม" suffix="mg" type="number" /></v-col>
+            <v-col cols="6" sm="4"><v-text-field v-model.number="editForm.cholesterol" label="คอเลสเตอรอล" suffix="mg" type="number" /></v-col>
           </v-row>
         </v-card-text>
         <v-card-actions class="pa-5 pt-0">
@@ -646,29 +649,10 @@ async function deleteLog(id) {
 </script>
 
 <style scoped>
-.meal-total {
-  background: rgba(0, 0, 0, 0.025);
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.selected-food-preview {
-  background: rgba(45, 106, 79, 0.06);
-  border: 1px solid rgba(45, 106, 79, 0.15);
-}
-
-.food-list {
-  border: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.food-item-row {
-  transition: background 0.15s;
-}
-
-.food-item-row:hover {
-  background: rgba(45, 106, 79, 0.06) !important;
-}
-
-.selected-row {
-  background: rgba(45, 106, 79, 0.1) !important;
-}
+.meal-total { background: rgba(0,0,0,0.025); border-top: 1px solid rgba(0,0,0,0.06); }
+.selected-food-preview { background: rgba(45,106,79,0.06); border: 1px solid rgba(45,106,79,0.15); }
+.food-list { border: 1px solid rgba(0,0,0,0.08); }
+.food-item-row { transition: background 0.15s; }
+.food-item-row:hover { background: rgba(45,106,79,0.06) !important; }
+.selected-row { background: rgba(45,106,79,0.1) !important; }
 </style>
