@@ -182,9 +182,9 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+</template>
 
-
-  <script setup>
+<script setup>
 import { ref, computed, onMounted } from 'vue'
 import { Doughnut } from 'vue-chartjs'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
@@ -341,28 +341,28 @@ function intensityColor(v) { return v === 'high' ? 'error' : v === 'low' ? 'succ
 function intensityLabel(v) { return v === 'high' ? 'หนัก' : v === 'low' ? 'เบา' : 'ปานกลาง' }
 </script>
 
-  <style scoped>
-    .activity-icon-wrap {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      background: rgba(244, 162, 97, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
+<style scoped>
+.activity-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(244, 162, 97, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
-    .activity-item-card {
-      transition: box-shadow 0.2s;
-    }
+.activity-item-card {
+  transition: box-shadow 0.2s;
+}
 
-    .activity-item-card:hover {
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
-    }
+.activity-item-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+}
 
-    .notes-box {
-      background: rgba(0, 0, 0, 0.03);
-      border-left: 3px solid rgba(45, 106, 79, 0.3);
-    }
-  </style>
+.notes-box {
+  background: rgba(0, 0, 0, 0.03);
+  border-left: 3px solid rgba(45, 106, 79, 0.3);
+}
+</style>
