@@ -182,10 +182,10 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
-</template>
+
 
   <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Doughnut } from 'vue-chartjs'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { useNutritionStore } from '../stores/nutrition'
@@ -194,6 +194,8 @@ import api from '../plugins/axios'
 ChartJS.register(ArcElement, Tooltip, Legend)
 
 const store = useNutritionStore()
+
+onMounted(() => store.fetchAll())
 const selectedDate = computed({ get: () => store.selectedDate, set: v => store.setDate(v) })
 const activities = computed(() => store.todayActivities)
 const dialog = ref(false)

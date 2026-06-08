@@ -391,11 +391,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useNutritionStore } from '../stores/nutrition'
 import api from '../plugins/axios'
 
 const store = useNutritionStore()
+
+onMounted(() => store.fetchAll())
 const selectedDate = computed({ get: () => store.selectedDate, set: v => store.setDate(v) })
 const mealSummary = computed(() => store.mealSummary)
 const mealTypes = computed(() => store.mealTypes)
