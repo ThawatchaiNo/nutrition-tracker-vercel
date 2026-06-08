@@ -110,11 +110,20 @@ const navItems = [
   { to: '/reports', icon: 'mdi-chart-line', title: 'รายงานและกราฟ' },
 ]
 
-onMounted(() => nutrition.fetchAll())
+// หน้าที่ต้องการ fetch ข้อมูล
+const fetchPages = ['/dashboard', '/food-log', '/activity', '/reports']
 
-// fetch ใหม่ทุกครั้งที่เปลี่ยนหน้า
-watch(() => route.path, () => {
-  nutrition.fetchAll()
+onMounted(() => {
+  if (fetchPages.includes(route.path)) nutrition.fetchAll()
+})
+
+// fetch เฉพาะหน้าที่จำเป็น ไม่ fetch ซ้ำถ้าหน้าเดิม
+let lastFetchedPath = ''
+watch(() => route.path, (newPath) => {
+  if (fetchPages.includes(newPath) && newPath !== lastFetchedPath) {
+    lastFetchedPath = newPath
+    nutrition.fetchAll()
+  }
 })
 
 // fetch ใหม่ทุกครั้งที่เปลี่ยนหน้า
