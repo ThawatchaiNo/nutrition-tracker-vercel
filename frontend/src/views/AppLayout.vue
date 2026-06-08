@@ -94,7 +94,6 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
 import { useDisplay, useTheme } from 'vuetify'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
@@ -126,11 +125,6 @@ const navItems = [
 ]
 
 onMounted(() => nutrition.fetchAll())
-
-// fetch ใหม่ทุกครั้งที่เปลี่ยนหน้า
-watch(() => router.currentRoute.value.path, () => {
-  nutrition.fetchAll()
-})
 
 function handleLogout() {
   auth.logout()
