@@ -5,13 +5,8 @@
         <h1 class="font-heading text-h5 font-weight-bold">บันทึกอาหาร</h1>
         <p class="text-medium-emphasis text-body-2">บันทึกอาหารในแต่ละมื้อ</p>
       </div>
-      <div class="d-flex align-center gap-3">
-        <v-btn color="primary" @click="openAddDialogQuick">
-          <v-icon start>mdi-plus</v-icon> เพิ่มอาหาร
-        </v-btn>
-        <v-text-field v-model="selectedDate" type="date" density="compact" hide-details style="max-width: 180px"
-          prepend-inner-icon="mdi-calendar" @update:model-value="store.fetchAll()" />
-      </div>
+      <v-text-field v-model="selectedDate" type="date" density="compact" hide-details style="max-width: 180px"
+        prepend-inner-icon="mdi-calendar" @update:model-value="store.fetchAll()" />
     </div>
 
     <!-- Meal Picker Dialog -->
@@ -391,11 +386,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useNutritionStore } from '../stores/nutrition'
 import api from '../plugins/axios'
 
 const store = useNutritionStore()
+
+onMounted(() => store.fetchAll())
 const selectedDate = computed({ get: () => store.selectedDate, set: v => store.setDate(v) })
 const mealSummary = computed(() => store.mealSummary)
 const mealTypes = computed(() => store.mealTypes)
