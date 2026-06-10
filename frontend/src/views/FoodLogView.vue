@@ -318,43 +318,30 @@
     </v-dialog>
 
     <!-- ── Edit Food Dialog ── -->
-    <v-dialog v-model="editDialog" max-width="560" persistent>
+    <v-dialog v-model="editDialog" max-width="420" persistent>
       <v-card>
-        <v-card-title class="font-heading pa-5 pb-3">
-          <v-icon color="primary" class="mr-2">mdi-pencil-outline</v-icon>
-          แก้ไขรายการอาหาร
+        <v-card-title class="font-heading pa-5 pb-2">
+          <v-icon color="primary" size="18" class="mr-2">mdi-pencil-outline</v-icon>
+          {{ editForm.foodName }}
         </v-card-title>
         <v-card-text class="pa-5 pt-2">
-          <v-row>
-            <v-col cols="12" sm="8">
-              <v-text-field v-model="editForm.foodName" label="ชื่ออาหาร *" prepend-inner-icon="mdi-food" />
-            </v-col>
-            <v-col cols="12" sm="4">
-              <v-text-field v-model.number="editForm.quantity" label="ปริมาณ (g/ml)" type="number" />
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="6" sm="3"><v-text-field v-model.number="editForm.calories" label="พลังงาน" suffix="kcal"
-                type="number" /></v-col>
-            <v-col cols="6" sm="3"><v-text-field v-model.number="editForm.carbs" label="คาร์บ" suffix="g"
-                type="number" /></v-col>
-            <v-col cols="6" sm="3"><v-text-field v-model.number="editForm.protein" label="โปรตีน" suffix="g"
-                type="number" /></v-col>
-            <v-col cols="6" sm="3"><v-text-field v-model.number="editForm.fat" label="ไขมัน" suffix="g"
-                type="number" /></v-col>
-            <v-col cols="6" sm="4"><v-text-field v-model.number="editForm.sugar" label="น้ำตาล" suffix="g"
-                type="number" /></v-col>
-            <v-col cols="6" sm="4"><v-text-field v-model.number="editForm.sodium" label="โซเดียม" suffix="mg"
-                type="number" /></v-col>
-            <v-col cols="6" sm="4"><v-text-field v-model.number="editForm.cholesterol" label="คอเลสเตอรอล" suffix="mg"
-                type="number" /></v-col>
-          </v-row>
+          <!-- ปริมาณ + kcal แบบเดียวกับในภาพ -->
+          <div class="d-flex align-center gap-4">
+            <v-text-field v-model.number="editForm.quantity" label="ปริมาณที่กิน" suffix="g" type="number"
+              density="comfortable" hide-details style="max-width: 160px" @update:model-value="recalcEdit" />
+            <div class="flex-grow-1">
+              <div class="text-h5 font-weight-bold text-primary">{{ editForm.calories }} kcal</div>
+              <div class="text-caption text-medium-emphasis mt-1">
+                คาร์บ {{ editForm.carbs }}g · โปรตีน {{ editForm.protein }}g · ไขมัน {{ editForm.fat }}g
+              </div>
+            </div>
+          </div>
         </v-card-text>
         <v-card-actions class="pa-5 pt-0">
           <v-spacer />
           <v-btn variant="text" @click="editDialog = false">ยกเลิก</v-btn>
           <v-btn color="primary" :loading="editSaving" @click="saveEdit">
-            <v-icon start>mdi-content-save</v-icon> บันทึกการแก้ไข
+            <v-icon start>mdi-content-save</v-icon> บันทึก
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -580,12 +567,24 @@ async function saveFood() {
 
 // ── Edit dialog ──
 const editDialog = ref(false)
+const editBaseValues = ref({})
 const editSaving = ref(false)
 const editingId = ref(null)
 const editForm = ref(emptyForm())
 
 function openEditDialog(item) {
   editingId.value = item.id
+  // เก็บค่า base (ต้นฉบับ) ไว้สำหรับคำนวณ ไม่แตะคลังเมนู
+  editBaseValues.value = {
+    quantity: item.quantity,
+    calories: item.calories,
+    carbs: item.carbs,
+    protein: item.protein,
+    fat: item.fat,
+    sugar: item.sugar,
+    sodium: item.sodium,
+    cholesterol: item.cholesterol,
+  }
   editForm.value = {
     foodName: item.foodName,
     quantity: item.quantity,
@@ -598,6 +597,20 @@ function openEditDialog(item) {
     cholesterol: item.cholesterol,
   }
   editDialog.value = true
+}
+
+// คำนวณสารอาหารใหม่เมื่อแก้ปริมาณ
+function recalcEdit(newQty) {
+  if (!newQty || !editBaseValues.value.quantity) return
+  const base = editBaseValues.value
+  const ratio = newQty / base.quantity
+  editForm.value.calories = Math.round(base.calories * ratio)
+  editForm.value.carbs = +(base.carbs * ratio).toFixed(1)
+  editForm.value.protein = +(base.protein * ratio).toFixed(1)
+  editForm.value.fat = +(base.fat * ratio).toFixed(1)
+  editForm.value.sugar = +(base.sugar * ratio).toFixed(1)
+  editForm.value.sodium = Math.round(base.sodium * ratio)
+  editForm.value.cholesterol = Math.round(base.cholesterol * ratio)
 }
 
 async function saveEdit() {
@@ -641,6 +654,18 @@ async function deleteLog(id) {
 </script>
 
 <style scoped>
+.calc-result-box {
+  background: rgba(45, 106, 79, 0.05);
+  border: 1px solid rgba(45, 106, 79, 0.15);
+}
+
+.nutrient-chip {
+  text-align: center;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
+}
+
 .meal-total {
   background: rgba(0, 0, 0, 0.025);
   border-top: 1px solid rgba(0, 0, 0, 0.06);

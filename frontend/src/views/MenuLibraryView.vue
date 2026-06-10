@@ -5,10 +5,24 @@
                 <h1 class="font-heading text-h5 font-weight-bold">คลังเมนูของฉัน</h1>
                 <p class="text-medium-emphasis text-body-2">จัดการเมนูอาหารส่วนตัว เพิ่ม แก้ไข ลบได้</p>
             </div>
-            <v-btn color="primary" @click="openAddDialog">
-                <v-icon start>mdi-plus</v-icon> เพิ่มเมนูใหม่
-            </v-btn>
+            <div class="d-flex gap-2 flex-wrap">
+                <v-btn variant="tonal" color="success" @click="triggerImport">
+                    <v-icon start>mdi-file-excel</v-icon> Import Excel
+                </v-btn>
+                <v-btn variant="tonal" color="teal" @click="exportMyMenus" :disabled="customItems.length === 0">
+                    <v-icon start>mdi-export</v-icon> Export เมนูของฉัน
+                </v-btn>
+                <v-btn color="primary" @click="openAddDialog">
+                    <v-icon start>mdi-plus</v-icon> เพิ่มเมนูใหม่
+                </v-btn>
+                <input ref="fileInput" type="file" accept=".xlsx" style="display:none" @change="handleImport" />
+            </div>
         </div>
+
+        <!-- Import Result Alert -->
+        <v-alert v-if="importResult" :type="importResult.type" class="mb-4" closable @click:close="importResult = null">
+            {{ importResult.message }}
+        </v-alert>
 
         <!-- Search -->
         <v-text-field v-model="search" label="ค้นหาเมนู" prepend-inner-icon="mdi-magnify" clearable hide-details
@@ -23,10 +37,18 @@
         <v-card v-else-if="customItems.length === 0" class="pa-8 text-center">
             <v-icon size="64" color="grey-lighten-2">mdi-food-off-outline</v-icon>
             <p class="text-h6 text-medium-emphasis mt-4">ยังไม่มีเมนูของฉัน</p>
-            <p class="text-body-2 text-medium-emphasis mb-4">เพิ่มเมนูอาหารที่กินบ่อย เพื่อใช้งานซ้ำได้เร็วขึ้น</p>
-            <v-btn color="primary" @click="openAddDialog">
-                <v-icon start>mdi-plus</v-icon> เพิ่มเมนูแรก
-            </v-btn>
+            <p class="text-body-2 text-medium-emphasis mb-4">เพิ่มเมนูเอง หรือ Import จาก Excel ได้เลยครับ</p>
+            <div class="d-flex justify-center gap-3">
+                <v-btn color="primary" @click="openAddDialog">
+                    <v-icon start>mdi-plus</v-icon> เพิ่มเมนูแรก
+                </v-btn>
+                <v-btn variant="tonal" color="success" @click="triggerImport">
+                    <v-icon start>mdi-file-excel</v-icon> Import Excel
+                </v-btn>
+                <v-btn variant="tonal" color="teal" @click="exportMyMenus" :disabled="customItems.length === 0">
+                    <v-icon start>mdi-export</v-icon> Export เมนูของฉัน
+                </v-btn>
+            </div>
         </v-card>
 
         <!-- Table -->
@@ -44,12 +66,12 @@
                 <template #item.calories="{ item }">
                     <span class="text-primary font-weight-bold">{{ item.calories }}</span>
                 </template>
-                <template #item.carbs="{ item }">{{ item.carbs?.toFixed(1) }}</template>
-                <template #item.protein="{ item }">{{ item.protein?.toFixed(1) }}</template>
-                <template #item.fat="{ item }">{{ item.fat?.toFixed(1) }}</template>
-                <template #item.sugar="{ item }">{{ item.sugar?.toFixed(1) }}</template>
-                <template #item.sodium="{ item }">{{ item.sodium?.toFixed(0) }}</template>
-                <template #item.cholesterol="{ item }">{{ item.cholesterol?.toFixed(0) }}</template>
+                <template #item.carbs="{ item }">{{ Number(item.carbs).toFixed(1) }}</template>
+                <template #item.protein="{ item }">{{ Number(item.protein).toFixed(1) }}</template>
+                <template #item.fat="{ item }">{{ Number(item.fat).toFixed(1) }}</template>
+                <template #item.sugar="{ item }">{{ Number(item.sugar).toFixed(1) }}</template>
+                <template #item.sodium="{ item }">{{ Number(item.sodium).toFixed(0) }}</template>
+                <template #item.cholesterol="{ item }">{{ Number(item.cholesterol).toFixed(0) }}</template>
                 <template #item.servingSize="{ item }">
                     {{ item.servingSize }}{{ item.unit }}
                 </template>
@@ -66,7 +88,7 @@
             </v-data-table>
         </v-card>
 
-        <!-- ── Add/Edit Dialog ── -->
+        <!-- Add/Edit Dialog -->
         <v-dialog v-model="dialog" max-width="560" persistent>
             <v-card>
                 <v-card-title class="font-heading pa-5 pb-3">
@@ -120,7 +142,7 @@
             </v-card>
         </v-dialog>
 
-        <!-- ── Confirm Delete ── -->
+        <!-- Confirm Delete -->
         <v-dialog v-model="confirmDialog" max-width="360" persistent>
             <v-card>
                 <v-card-title class="font-heading pa-5 pb-3">
@@ -141,7 +163,14 @@
             </v-card>
         </v-dialog>
 
-        <!-- Snackbar -->
+        <!-- Import Loading Dialog -->
+        <v-dialog v-model="importing" max-width="300" persistent>
+            <v-card class="pa-6 text-center">
+                <v-progress-circular indeterminate color="primary" size="48" class="mb-4" />
+                <p class="text-body-1">กำลัง Import ข้อมูล...</p>
+            </v-card>
+        </v-dialog>
+
         <v-snackbar v-model="snackbar" :color="snackColor" timeout="3000">
             {{ snackMsg }}
         </v-snackbar>
@@ -151,6 +180,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useNutritionStore } from '../stores/nutrition'
+import * as XLSX from 'xlsx'
 
 const store = useNutritionStore()
 const search = ref('')
@@ -165,6 +195,9 @@ const deleting = ref(false)
 const snackbar = ref(false)
 const snackMsg = ref('')
 const snackColor = ref('success')
+const fileInput = ref(null)
+const importing = ref(false)
+const importResult = ref(null)
 
 const emptyForm = () => ({
     name: '', servingSize: 100, unit: 'g',
@@ -196,11 +229,8 @@ const headers = [
 
 onMounted(async () => {
     loading.value = true
-    try {
-        await store.fetchAll()
-    } finally {
-        loading.value = false
-    }
+    try { await store.fetchAll() }
+    finally { loading.value = false }
 })
 
 function openAddDialog() {
@@ -214,16 +244,9 @@ function openEditDialog(item) {
     editMode.value = true
     editingId.value = item.id
     form.value = {
-        name: item.name,
-        servingSize: item.servingSize || 100,
-        unit: item.unit || 'g',
-        calories: item.calories,
-        carbs: item.carbs,
-        protein: item.protein,
-        fat: item.fat,
-        sugar: item.sugar,
-        sodium: item.sodium,
-        cholesterol: item.cholesterol,
+        name: item.name, servingSize: item.servingSize || 100, unit: item.unit || 'g',
+        calories: item.calories, carbs: item.carbs, protein: item.protein,
+        fat: item.fat, sugar: item.sugar, sodium: item.sodium, cholesterol: item.cholesterol,
     }
     dialog.value = true
 }
@@ -233,10 +256,10 @@ async function save() {
     try {
         if (editMode.value) {
             await store.updateCustomFoodItem(editingId.value, form.value)
-            showSnack('แก้ไขเมนูสำเร็จ', 'success')
+            showSnack('แก้ไขเมนูสำเร็จ')
         } else {
             await store.addCustomFoodItem(form.value)
-            showSnack('เพิ่มเมนูสำเร็จ', 'success')
+            showSnack('เพิ่มเมนูสำเร็จ')
         }
         dialog.value = false
     } catch (e) {
@@ -257,11 +280,118 @@ async function confirmDelete() {
         await store.deleteCustomFoodItem(deletingItem.value.id)
         confirmDialog.value = false
         deletingItem.value = null
-        showSnack('ลบเมนูสำเร็จ', 'success')
+        showSnack('ลบเมนูสำเร็จ')
     } catch (e) {
         showSnack('เกิดข้อผิดพลาด', 'error')
     } finally {
         deleting.value = false
+    }
+}
+
+// ── Export เมนูของฉันเป็น Excel ──
+function exportMyMenus() {
+    if (customItems.value.length === 0) return
+
+    const rows = [
+        ['ชื่อเมนู', 'ปริมาณ/ครั้ง (g)', 'พลังงาน (kcal)', 'คาร์บ (g)', 'โปรตีน (g)', 'ไขมัน (g)', 'น้ำตาล (g)', 'โซเดียม (mg)', 'คอเลสเตอรอล (mg)'],
+        ...customItems.value.map(item => [
+            item.name,
+            item.servingSize || 100,
+            item.calories || 0,
+            item.carbs || 0,
+            item.protein || 0,
+            item.fat || 0,
+            item.sugar || 0,
+            item.sodium || 0,
+            item.cholesterol || 0,
+        ])
+    ]
+
+    const ws = XLSX.utils.aoa_to_sheet(rows)
+    ws['!cols'] = [
+        { wch: 20 }, { wch: 18 }, { wch: 18 }, { wch: 12 },
+        { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 15 }, { wch: 18 }
+    ]
+
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'เมนูของฉัน')
+
+    const date = new Date().toISOString().split('T')[0]
+    XLSX.writeFile(wb, `my_menus_${date}.xlsx`)
+    showSnack(`Export ${customItems.value.length} เมนู สำเร็จ`)
+}
+
+// ── Import Excel ──
+function triggerImport() {
+    fileInput.value.click()
+}
+
+async function handleImport(event) {
+    const file = event.target.files[0]
+    if (!file) return
+    fileInput.value.value = '' // reset input
+
+    importing.value = true
+    importResult.value = null
+
+    try {
+        const data = await file.arrayBuffer()
+        const wb = XLSX.read(data)
+        const ws = wb.Sheets[wb.SheetNames[0]]
+        const rows = XLSX.utils.sheet_to_json(ws, { header: 1 })
+
+        // ข้ามแถว header (แถวแรก)
+        const dataRows = rows.slice(1).filter(row => row[0]) // กรองแถวที่มีชื่อเมนู
+
+        if (dataRows.length === 0) {
+            importResult.value = { type: 'warning', message: 'ไม่พบข้อมูลในไฟล์ กรุณาตรวจสอบ format ตาม Template' }
+            return
+        }
+
+        let success = 0
+        let skip = 0
+        const errors = []
+
+        for (const row of dataRows) {
+            const name = String(row[0] || '').trim()
+            if (!name) continue
+
+            try {
+                await store.addCustomFoodItem({
+                    name,
+                    servingSize: Number(row[1]) || 100,
+                    unit: 'g',
+                    calories: Number(row[2]) || 0,
+                    carbs: Number(row[3]) || 0,
+                    protein: Number(row[4]) || 0,
+                    fat: Number(row[5]) || 0,
+                    sugar: Number(row[6]) || 0,
+                    sodium: Number(row[7]) || 0,
+                    cholesterol: Number(row[8]) || 0,
+                })
+                success++
+            } catch (e) {
+                if (e.response?.data?.error === 'มีเมนูนี้อยู่แล้ว') {
+                    skip++
+                } else {
+                    errors.push(name)
+                }
+            }
+        }
+
+        let msg = `Import สำเร็จ ${success} รายการ`
+        if (skip > 0) msg += ` • ข้าม ${skip} รายการ (มีอยู่แล้ว)`
+        if (errors.length > 0) msg += ` • ล้มเหลว ${errors.length} รายการ`
+
+        importResult.value = {
+            type: success > 0 ? 'success' : 'warning',
+            message: msg
+        }
+
+    } catch (e) {
+        importResult.value = { type: 'error', message: 'ไม่สามารถอ่านไฟล์ได้ กรุณาใช้ไฟล์ .xlsx ตาม Template' }
+    } finally {
+        importing.value = false
     }
 }
 
