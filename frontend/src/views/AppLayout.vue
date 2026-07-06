@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+
     <!-- Mobile app bar -->
     <v-app-bar v-if="mobile" color="white" elevation="0" border="b">
       <v-app-bar-nav-icon @click="drawer = !drawer" />
@@ -64,17 +64,16 @@
       </template>
     </v-navigation-drawer>
 
-    <!-- Main content -->
-    <v-main>
-      <div class="pa-4 pa-md-6">
-        <router-view v-slot="{ Component }">
-          <transition name="slide" mode="out-in">
-            <component :is="Component" />
-          </transition>
-        </router-view>
-      </div>
-    </v-main>
-  </v-app>
+  <!-- Main content -->
+  <v-main>
+    <div class="pa-4 pa-md-6">
+      <router-view v-slot="{ Component }">
+        <transition name="slide" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
+    </div>
+  </v-main>
 </template>
 
 <script setup>
