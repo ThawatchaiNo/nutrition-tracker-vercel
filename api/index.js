@@ -83,19 +83,6 @@ app.post('/api/food-logs', auth, async (req, res) => {
   try { await connectDB(); const l = await FoodLog.create({ ...req.body, userId: req.user.id }); res.status(201).json({ ...l.toObject(), id: l._id }) }
   catch (e) { res.status(500).json({ error: e.message }) }
 })
-app.put('/api/food-logs/:id', auth, async (req, res) => {
-  try {
-    await connectDB()
-    const log = await FoodLog.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user.id },
-      req.body,
-      { new: true }
-    )
-    if (!log) return res.status(404).json({ error: 'Not found' })
-    res.json({ ...log.toObject(), id: log._id })
-  } catch (e) { res.status(500).json({ error: e.message }) }
-})
-
 app.delete('/api/food-logs/:id', auth, async (req, res) => {
   try { await connectDB(); await FoodLog.findOneAndDelete({ _id: req.params.id, userId: req.user.id }); res.json({ success: true }) }
   catch (e) { res.status(500).json({ error: e.message }) }
@@ -159,6 +146,19 @@ app.get('/api/food-items', auth, async (req, res) => {
     res.json((await FoodItem.find(filter).sort({ custom: 1, name: 1 })).map(f => ({ ...f.toObject(), id: f._id })))
   } catch (e) { res.status(500).json({ error: e.message }) }
 })
+// เมนูจากท่านอื่น — คืน custom food ของทุก user ยกเว้นของตัวเอง
+app.get('/api/food-items/community', auth, async (req, res) => {
+  try {
+    await connectDB()
+    const filter = { custom: true, userId: { $ne: req.user.id } }
+    if (req.query.q) filter.name = { $regex: req.query.q, $options: 'i' }
+    const items = await FoodItem.find(filter)
+      .sort({ name: 1 })
+      .select('-userId') // ไม่ส่ง userId ออกไป
+    res.json(items.map(f => ({ ...f.toObject(), id: f._id })))
+  } catch (e) { res.status(500).json({ error: e.message }) }
+})
+
 app.post('/api/food-items', auth, async (req, res) => {
   try {
     await connectDB()

@@ -11,6 +11,9 @@
                 <v-tab value="local">
                     <v-icon start size="18">mdi-database-outline</v-icon> เมนูมาตรฐาน
                 </v-tab>
+                <v-tab value="community">
+                    <v-icon start size="18">mdi-account-group-outline</v-icon> เมนูจากท่านอื่น
+                </v-tab>
                 <v-tab value="world">
                     <v-icon start size="18">mdi-earth</v-icon> Menu of the World
                 </v-tab>
@@ -29,7 +32,7 @@
                     <v-list lines="two" class="food-list rounded-xl" style="max-height: 260px; overflow-y: auto">
                         <v-list-item v-for="item in filteredLocalItems" :key="item.id"
                             :class="['mb-1 rounded-lg food-item-row', selectedFood?.id === item.id ? 'selected-row' : '']"
-                            @click="selectLocalFood(item)" style="cursor: pointer">
+                            @click="selectFood(item)" style="cursor: pointer">
                             <template #prepend>
                                 <v-avatar size="36" rounded="lg" :color="item.custom ? 'primary' : 'green'"
                                     variant="tonal">
@@ -56,7 +59,8 @@
                             <p class="text-body-2 mt-2">ไม่พบเมนูที่ค้นหา</p>
                         </div>
                     </v-list>
-                    <div v-if="selectedFood" class="mt-3 selected-food-preview pa-4 rounded-xl">
+                    <div v-if="selectedFood && activeTab === 'local'"
+                        class="mt-3 selected-food-preview pa-4 rounded-xl">
                         <div class="d-flex align-center gap-2 mb-2">
                             <v-icon color="primary" size="18">mdi-food</v-icon>
                             <span class="font-weight-bold text-body-2">{{ selectedFood.name }}</span>
@@ -77,7 +81,67 @@
                     </div>
                 </div>
 
-                <!-- แท็บ 2: Menu of the World -->
+                <!-- แท็บ 2: เมนูจากท่านอื่น -->
+                <div v-if="activeTab === 'community'">
+                    <v-text-field v-model="communitySearch" label="ค้นหาเมนูจากท่านอื่น"
+                        prepend-inner-icon="mdi-magnify" clearable hide-details class="mb-3"
+                        @update:model-value="searchCommunity" />
+
+                    <div v-if="communityLoading" class="text-center py-8">
+                        <v-progress-circular indeterminate color="primary" />
+                        <p class="text-body-2 mt-3 text-medium-emphasis">กำลังโหลด...</p>
+                    </div>
+
+                    <v-list v-else lines="two" class="food-list rounded-xl" style="max-height: 260px; overflow-y: auto">
+                        <v-list-item v-for="item in filteredCommunityItems" :key="item.id"
+                            :class="['mb-1 rounded-lg food-item-row', selectedFood?.id === item.id ? 'selected-row' : '']"
+                            @click="selectFood(item)" style="cursor: pointer">
+                            <template #prepend>
+                                <v-avatar size="36" rounded="lg" color="teal" variant="tonal">
+                                    <v-icon size="18" color="teal">mdi-account-group</v-icon>
+                                </v-avatar>
+                            </template>
+                            <template #title>
+                                <span class="text-body-2 font-weight-medium">{{ item.name }}</span>
+                            </template>
+                            <template #subtitle>
+                                <span class="text-caption">{{ item.calories }} kcal / {{ item.servingSize }}{{ item.unit
+                                    }}</span>
+                            </template>
+                            <template #append>
+                                <v-icon v-if="selectedFood?.id === item.id" color="primary">mdi-check-circle</v-icon>
+                            </template>
+                        </v-list-item>
+                        <div v-if="filteredCommunityItems.length === 0 && !communityLoading"
+                            class="text-center py-6 text-medium-emphasis">
+                            <v-icon size="36" color="grey-lighten-2">mdi-account-group-outline</v-icon>
+                            <p class="text-body-2 mt-2">ยังไม่มีเมนูจากท่านอื่น</p>
+                        </div>
+                    </v-list>
+
+                    <div v-if="selectedFood && activeTab === 'community'"
+                        class="mt-3 selected-food-preview pa-4 rounded-xl">
+                        <div class="d-flex align-center gap-2 mb-2">
+                            <v-icon color="teal" size="18">mdi-account-group</v-icon>
+                            <span class="font-weight-bold text-body-2">{{ selectedFood.name }}</span>
+                        </div>
+                        <v-row dense align="center">
+                            <v-col cols="6">
+                                <v-text-field v-model.number="form.quantity" label="ปริมาณที่กิน"
+                                    :suffix="selectedFood.unit || 'g'" type="number" density="compact" hide-details
+                                    @update:model-value="recalcFromLocal" />
+                            </v-col>
+                            <v-col cols="6" class="text-center">
+                                <div class="text-h6 font-weight-bold text-primary">{{ form.calories }} kcal</div>
+                                <div class="text-caption text-medium-emphasis">คาร์บ {{ form.carbs }}g · โปรตีน {{
+                                    form.protein }}g ·
+                                    ไขมัน {{ form.fat }}g</div>
+                            </v-col>
+                        </v-row>
+                    </div>
+                </div>
+
+                <!-- แท็บ 3: Menu of the World -->
                 <div v-if="activeTab === 'world'">
                     <div class="d-flex gap-2 mb-3">
                         <v-text-field v-model="worldSearch" label="ค้นหาอาหารทั่วโลก (ภาษาอังกฤษ)"
@@ -148,7 +212,7 @@
                     </div>
                 </div>
 
-                <!-- แท็บ 3: กรอกเอง -->
+                <!-- แท็บ 4: กรอกเอง -->
                 <div v-if="activeTab === 'manual'">
                     <v-row>
                         <v-col cols="12" sm="8">
@@ -192,7 +256,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useNutritionStore } from '../../stores/nutrition'
 import api from '../../plugins/axios'
 
@@ -207,8 +271,49 @@ const emit = defineEmits(['update:modelValue', 'save'])
 const store = useNutritionStore()
 const activeTab = ref('local')
 const saveToLibrary = ref(false)
+
+// ── Local ──
 const localSearch = ref('')
 const selectedFood = ref(null)
+
+const filteredLocalItems = computed(() => {
+    const items = store.foodItems
+    if (!localSearch.value) return items
+    return items.filter(f => f.name.toLowerCase().includes(localSearch.value.toLowerCase()))
+})
+
+// ── Community ──
+const communitySearch = ref('')
+const communityItems = ref([])
+const communityLoading = ref(false)
+
+const filteredCommunityItems = computed(() => {
+    if (!communitySearch.value) return communityItems.value
+    return communityItems.value.filter(f => f.name.toLowerCase().includes(communitySearch.value.toLowerCase()))
+})
+
+async function loadCommunity() {
+    communityLoading.value = true
+    try {
+        const res = await api.get('/food-items/community')
+        communityItems.value = res.data
+    } catch (e) {
+        console.error('Community load error:', e)
+    } finally {
+        communityLoading.value = false
+    }
+}
+
+function searchCommunity() { /* computed handles filter */ }
+
+// โหลด community เมื่อสลับแท็บ
+watch(activeTab, (tab) => {
+    if (tab === 'community' && communityItems.value.length === 0) {
+        loadCommunity()
+    }
+})
+
+// ── World ──
 const worldSearch = ref('')
 const worldLoading = ref(false)
 const worldResults = ref([])
@@ -216,6 +321,23 @@ const worldSearched = ref(false)
 const worldError = ref('')
 const selectedWorldFood = ref(null)
 
+async function searchWorldFood() {
+    if (!worldSearch.value.trim()) return
+    worldLoading.value = true
+    worldError.value = ''
+    worldSearched.value = true
+    selectedWorldFood.value = null
+    try {
+        const res = await api.get(`/world-food?q=${encodeURIComponent(worldSearch.value.trim())}`)
+        worldResults.value = res.data
+    } catch {
+        worldError.value = 'ไม่สามารถเชื่อมต่อได้ กรุณาลองใหม่'
+    } finally {
+        worldLoading.value = false
+    }
+}
+
+// ── Form ──
 const mealLabel = computed(() => store.mealTypes.find(m => m.value === props.meal)?.label || '')
 
 const emptyForm = () => ({
@@ -225,7 +347,6 @@ const emptyForm = () => ({
 })
 const form = ref(emptyForm())
 
-// reset เมื่อเปิด dialog ใหม่
 watch(() => props.modelValue, (val) => {
     if (val) {
         form.value = emptyForm()
@@ -236,28 +357,22 @@ watch(() => props.modelValue, (val) => {
         worldError.value = ''
         worldSearch.value = ''
         localSearch.value = ''
+        communitySearch.value = ''
         saveToLibrary.value = false
         activeTab.value = 'local'
     }
 })
 
-const filteredLocalItems = computed(() => {
-    const items = store.foodItems
-    if (!localSearch.value) return items
-    const q = localSearch.value.toLowerCase()
-    return items.filter(f => f.name.toLowerCase().includes(q))
-})
-
-function selectLocalFood(item) {
+function selectFood(item) {
     selectedFood.value = item
     form.value = {
         foodName: item.name,
         quantity: item.servingSize || 100,
         calories: Math.round(item.calories),
-        carbs: +item.carbs.toFixed(1),
-        protein: +item.protein.toFixed(1),
-        fat: +item.fat.toFixed(1),
-        sugar: +item.sugar.toFixed(1),
+        carbs: +Number(item.carbs).toFixed(1),
+        protein: +Number(item.protein).toFixed(1),
+        fat: +Number(item.fat).toFixed(1),
+        sugar: +Number(item.sugar).toFixed(1),
         sodium: Math.round(item.sodium),
         cholesterol: Math.round(item.cholesterol),
     }
@@ -275,22 +390,6 @@ function recalcFromLocal(qty) {
     form.value.sugar = +(f.sugar * r).toFixed(1)
     form.value.sodium = Math.round(f.sodium * r)
     form.value.cholesterol = Math.round(f.cholesterol * r)
-}
-
-async function searchWorldFood() {
-    if (!worldSearch.value.trim()) return
-    worldLoading.value = true
-    worldError.value = ''
-    worldSearched.value = true
-    selectedWorldFood.value = null
-    try {
-        const res = await api.get(`/world-food?q=${encodeURIComponent(worldSearch.value.trim())}`)
-        worldResults.value = res.data
-    } catch {
-        worldError.value = 'ไม่สามารถเชื่อมต่อได้ กรุณาลองใหม่'
-    } finally {
-        worldLoading.value = false
-    }
 }
 
 function selectWorldFood(item) {
@@ -323,6 +422,7 @@ function recalcFromWorld(qty) {
 
 const canSave = computed(() => {
     if (activeTab.value === 'local') return !!selectedFood.value
+    if (activeTab.value === 'community') return !!selectedFood.value
     if (activeTab.value === 'world') return !!selectedWorldFood.value
     if (activeTab.value === 'manual') return !!form.value.foodName
     return false
