@@ -83,6 +83,18 @@ app.post('/api/food-logs', auth, async (req, res) => {
   try { await connectDB(); const l = await FoodLog.create({ ...req.body, userId: req.user.id }); res.status(201).json({ ...l.toObject(), id: l._id }) }
   catch (e) { res.status(500).json({ error: e.message }) }
 })
+app.put('/api/food-logs/:id', auth, async (req, res) => {
+  try {
+    await connectDB()
+    const log = await FoodLog.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      req.body,
+      { new: true }
+    )
+    if (!log) return res.status(404).json({ error: 'Not found' })
+    res.json({ ...log.toObject(), id: log._id })
+  } catch (e) { res.status(500).json({ error: e.message }) }
+})
 app.delete('/api/food-logs/:id', auth, async (req, res) => {
   try { await connectDB(); await FoodLog.findOneAndDelete({ _id: req.params.id, userId: req.user.id }); res.json({ success: true }) }
   catch (e) { res.status(500).json({ error: e.message }) }
