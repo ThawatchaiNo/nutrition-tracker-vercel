@@ -51,6 +51,20 @@ app.post('/api/goals', auth, async (req, res) => {
 })
 
 // ── Food Logs ──
+// ── ดึง food logs ทั้งหมดในช่วงวันที่ (สำหรับหน้าประวัติ) ──
+app.get('/api/food-logs/all', auth, async (req, res) => {
+  try {
+    await connectDB()
+    const { startDate, endDate } = req.query
+    const match = { userId: req.user.id }
+    if (startDate || endDate) match.date = {}
+    if (startDate) match.date.$gte = startDate
+    if (endDate) match.date.$lte = endDate
+    const logs = await FoodLog.find(match).sort({ date: -1, createdAt: -1 })
+    res.json(logs.map(l => ({ ...l.toObject(), id: l._id })))
+  } catch (e) { res.status(500).json({ error: e.message }) }
+})
+
 app.get('/api/food-logs/summary', auth, async (req, res) => {
   try {
     await connectDB()
@@ -88,19 +102,33 @@ app.put('/api/food-logs/:id', auth, async (req, res) => {
     await connectDB()
     const log = await FoodLog.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.id },
-      req.body,
-      { new: true }
+      req.body, { new: true }
     )
     if (!log) return res.status(404).json({ error: 'Not found' })
     res.json({ ...log.toObject(), id: log._id })
   } catch (e) { res.status(500).json({ error: e.message }) }
 })
+
 app.delete('/api/food-logs/:id', auth, async (req, res) => {
   try { await connectDB(); await FoodLog.findOneAndDelete({ _id: req.params.id, userId: req.user.id }); res.json({ success: true }) }
   catch (e) { res.status(500).json({ error: e.message }) }
 })
 
 // ── Activities ──
+// ── ดึง activities ทั้งหมดในช่วงวันที่ (สำหรับหน้าประวัติ) ──
+app.get('/api/activities/all', auth, async (req, res) => {
+  try {
+    await connectDB()
+    const { startDate, endDate } = req.query
+    const match = { userId: req.user.id }
+    if (startDate || endDate) match.date = {}
+    if (startDate) match.date.$gte = startDate
+    if (endDate) match.date.$lte = endDate
+    const acts = await Activity.find(match).sort({ date: -1, createdAt: -1 })
+    res.json(acts.map(a => ({ ...a.toObject(), id: a._id })))
+  } catch (e) { res.status(500).json({ error: e.message }) }
+})
+
 app.get('/api/activities/summary', auth, async (req, res) => {
   try {
     await connectDB()
@@ -158,15 +186,12 @@ app.get('/api/food-items', auth, async (req, res) => {
     res.json((await FoodItem.find(filter).sort({ custom: 1, name: 1 })).map(f => ({ ...f.toObject(), id: f._id })))
   } catch (e) { res.status(500).json({ error: e.message }) }
 })
-// เมนูจากท่านอื่น — คืน custom food ของทุก user ยกเว้นของตัวเอง
 app.get('/api/food-items/community', auth, async (req, res) => {
   try {
     await connectDB()
     const filter = { custom: true, userId: { $ne: req.user.id } }
     if (req.query.q) filter.name = { $regex: req.query.q, $options: 'i' }
-    const items = await FoodItem.find(filter)
-      .sort({ name: 1 })
-      .select('-userId') // ไม่ส่ง userId ออกไป
+    const items = await FoodItem.find(filter).sort({ name: 1 }).select('-userId')
     res.json(items.map(f => ({ ...f.toObject(), id: f._id })))
   } catch (e) { res.status(500).json({ error: e.message }) }
 })

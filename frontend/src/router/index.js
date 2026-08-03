@@ -13,6 +13,7 @@ const routes = [
       { path: 'food-log', name: 'FoodLog', component: () => import('../views/FoodLogView.vue') },
       { path: 'activity', name: 'Activity', component: () => import('../views/ActivityView.vue') },
       { path: 'reports', name: 'Reports', component: () => import('../views/ReportsView.vue') },
+      { path: 'history', name: 'History', component: () => import('../views/HistoryView.vue') },
       { path: 'goals', name: 'Goals', component: () => import('../views/GoalsView.vue') },
       { path: 'menu-library', name: 'MenuLibrary', component: () => import('../views/MenuLibraryView.vue') },
     ]

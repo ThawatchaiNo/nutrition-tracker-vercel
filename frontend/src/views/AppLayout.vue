@@ -1,6 +1,5 @@
 <template>
-
-    <!-- Mobile app bar -->
+  <v-app>
     <v-app-bar v-if="mobile" color="white" elevation="0" border="b">
       <v-app-bar-nav-icon @click="drawer = !drawer" />
       <v-app-bar-title>
@@ -13,9 +12,7 @@
       </template>
     </v-app-bar>
 
-    <!-- Sidebar Navigation -->
     <v-navigation-drawer v-model="drawer" :permanent="!mobile" :temporary="mobile" width="240" color="surface">
-      <!-- Logo -->
       <div class="px-4 py-5">
         <div class="d-flex align-center gap-3">
           <div class="logo-badge">
@@ -30,7 +27,6 @@
 
       <v-divider />
 
-      <!-- User info -->
       <div class="px-4 py-3">
         <div class="d-flex align-center gap-2">
           <v-avatar color="primary" size="36">
@@ -45,35 +41,55 @@
 
       <v-divider class="mb-2" />
 
-      <!-- Nav items -->
       <v-list class="px-2">
-        <v-list-item v-for="item in navItems" :key="item.to" :to="item.to" :prepend-icon="item.icon" :title="item.title"
-          rounded="lg" class="nav-item mb-1" active-class="active-nav" color="primary" />
+        <v-list-item
+          v-for="item in navItems" :key="item.to"
+          :to="item.to" :prepend-icon="item.icon"
+          :title="item.title" rounded="lg"
+          class="nav-item mb-1"
+          active-class="active-nav"
+          color="primary"
+        />
       </v-list>
 
       <template #append>
         <v-divider class="mb-2" />
         <div class="px-2 pb-3">
-          <v-list-item prepend-icon="mdi-book-open-outline" title="คลังเมนูของฉัน" to="/menu-library" rounded="lg"
-            class="nav-item mb-1" color="primary" active-class="active-nav" />
-          <v-list-item prepend-icon="mdi-cog-outline" title="เป้าหมาย" to="/goals" rounded="lg" class="nav-item mb-1"
-            color="primary" active-class="active-nav" />
-          <v-list-item prepend-icon="mdi-logout" title="ออกจากระบบ" rounded="lg" class="nav-item" color="error"
-            @click="handleLogout" />
+          <v-list-item
+            prepend-icon="mdi-history"
+            title="ประวัติการบันทึก" to="/history" rounded="lg"
+            class="nav-item mb-1" color="primary" active-class="active-nav"
+          />
+          <v-list-item
+            prepend-icon="mdi-book-open-outline"
+            title="คลังเมนูของฉัน" to="/menu-library" rounded="lg"
+            class="nav-item mb-1" color="primary" active-class="active-nav"
+          />
+          <v-list-item
+            prepend-icon="mdi-cog-outline"
+            title="เป้าหมาย" to="/goals" rounded="lg"
+            class="nav-item mb-1" color="primary" active-class="active-nav"
+          />
+          <v-list-item
+            prepend-icon="mdi-logout"
+            title="ออกจากระบบ" rounded="lg"
+            class="nav-item" color="error"
+            @click="handleLogout"
+          />
         </div>
       </template>
     </v-navigation-drawer>
 
-  <!-- Main content -->
-  <v-main>
-    <div class="pa-4 pa-md-6">
-      <router-view v-slot="{ Component }">
-        <transition name="slide" mode="out-in">
-          <component :is="Component" />
-        </transition>
-      </router-view>
-    </div>
-  </v-main>
+    <v-main>
+      <div class="pa-4 pa-md-6">
+        <router-view v-slot="{ Component }">
+          <transition name="slide" mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </router-view>
+      </div>
+    </v-main>
+  </v-app>
 </template>
 
 <script setup>
@@ -96,7 +112,6 @@ function toggleTheme() {
 }
 
 const userInitial = computed(() => (auth.user?.name || 'U').charAt(0).toUpperCase())
-
 const todayFormatted = computed(() => {
   return new Date().toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
 })
@@ -118,12 +133,9 @@ function handleLogout() {
 
 <style scoped>
 .logo-badge {
-  width: 40px;
-  height: 40px;
+  width: 40px; height: 40px;
   background: rgba(45, 106, 79, 0.1);
   border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
 }
 </style>
